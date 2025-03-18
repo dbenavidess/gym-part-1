@@ -1,21 +1,21 @@
-package com.dbenavidess.domain;
+package com.dbenavidess.gym_part_1.domain.model;
 
 import lombok.Getter;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import java.util.UUID;
 
 @Getter
-public abstract class User {
-    private final long id;
+public class User {
+    private final UUID id;
     private final String firstName;
     private final String lastName;
     private final String username;
     private final String password;
     private final boolean isActive;
 
-    public User(long id, String firstName, String lastName, boolean isActive) {
-
-        this.id = id;
+    public User(String firstName, String lastName, boolean isActive) {
+        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActive = isActive;
@@ -23,8 +23,8 @@ public abstract class User {
         this.password = calculatePassword();
     }
 
-    public User(long id, String firstName, String lastName, String username, String password, boolean isActive) {
-        this.id = id;
+    public User(String firstName, String lastName, String username, String password, boolean isActive) {
+        this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;

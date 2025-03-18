@@ -1,12 +1,13 @@
-package com.dbenavidess.domain;
+package com.dbenavidess.gym_part_1.domain.model;
 
 import lombok.Getter;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Getter
 public class Training {
-    private final long id;
+    private final UUID id;
     private final Trainer trainer;
 //    private long trainerId;
     private final Trainee trainee;
@@ -16,8 +17,8 @@ public class Training {
     private final Date date;
     private final int duration;
 
-    public Training(long id, Trainer trainer, Trainee trainee, String name, TrainingType type, Date date, int duration) {
-        this.id = id;
+    public Training(Trainer trainer, Trainee trainee, String name, TrainingType type, Date date, int duration) {
+        this.id = UUID.randomUUID();
         this.trainer = trainer;
         this.trainee = trainee;
         this.name = name;
