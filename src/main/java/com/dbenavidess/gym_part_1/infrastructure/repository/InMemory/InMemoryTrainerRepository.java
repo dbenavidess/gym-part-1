@@ -2,17 +2,19 @@ package com.dbenavidess.gym_part_1.infrastructure.repository.InMemory;
 
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.repository.TrainerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 @Repository
 public class InMemoryTrainerRepository implements TrainerRepository {
 
-    private final Map<UUID,Trainer> storage = new HashMap<>();
+    @Autowired
+    private Map<UUID,Trainer> storage;
 
     @Override
     public Trainer createTrainer(Trainer trainer) {
@@ -30,13 +32,20 @@ public class InMemoryTrainerRepository implements TrainerRepository {
     }
 
     @Override
-    public void deleteTrainer(Trainer trainer) {
-        storage.remove(trainer.getId());
+    public void deleteTrainer(UUID id) {
+        storage.remove(id);
     }
 
     @Override
     public Trainer getTrainer(UUID id) {
         return storage.get(id);
+    }
+
+    @Override
+    public List<Trainer> search(Predicate<Trainer> p){
+        return storage.values().stream()
+                .filter(p)
+                .toList();
     }
 
     @Override

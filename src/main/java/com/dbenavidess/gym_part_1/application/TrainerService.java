@@ -15,15 +15,16 @@ public class TrainerService {
     TrainerRepository repository;
 
     public Trainer createTrainer(Trainer trainer){
-        return repository.createTrainer(trainer);
+
+        Trainer res = repository.createTrainer(trainer);
+        if (res == null){
+            throw new RuntimeException("Invalid trainer");
+        }
+        return res;
     }
 
     public Trainer updateTrainer(Trainer trainer){
         return repository.updateTrainer(trainer);
-    }
-
-    public void deleteTrainer(Trainer trainer){
-        repository.deleteTrainer(trainer);
     }
 
     public Trainer getTrainer(UUID id){
