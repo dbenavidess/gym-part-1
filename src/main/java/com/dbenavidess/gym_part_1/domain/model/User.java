@@ -1,35 +1,40 @@
 package com.dbenavidess.gym_part_1.domain.model;
 
-
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
-
+import lombok.ToString;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-@Getter
+@ToString
+@EqualsAndHashCode
 public class User implements Serializable {
+    @Getter
     private UUID id;
+    @Getter
     private String firstName;
+    @Getter
     private String lastName;
+    @Getter
     private String username;
+    @Getter
     private String password;
     private boolean isActive;
 
-    private UserRepository userRepository;
 
     public User() {
     }
 
-    public User(String firstName, String lastName, boolean isActive) {
+    public User(String firstName, String lastName, boolean isActive, UserRepository repository) {
         this.id = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.isActive = isActive;
-        this.username = calculateUsername();
+        this.username = calculateUsername(repository);
         this.password = calculatePassword();
     }
 
@@ -49,8 +54,10 @@ public class User implements Serializable {
         return new String(array, StandardCharsets.UTF_8);
     }
 
-    private String calculateUsername(){
-        int number = userRepository.search(user -> user.username.contains(this.firstName + "." + this.lastName)).size();
+    private String calculateUsername(UserRepository userRepository){
+        List<User> list = userRepository.search(user -> user.username.contains(this.firstName + "." + this.lastName));
+        System.out.println(list.toString());
+        int number = list.size();
         if(number > 0){
             return this.firstName + "." + this.lastName + number;
         }
@@ -58,9 +65,7 @@ public class User implements Serializable {
 
     }
 
-    @Autowired
-    void setUserRepository(UserRepository repository){
-        this.userRepository = repository;
+    public boolean getIsActive() {
+        return isActive;
     }
-
 }

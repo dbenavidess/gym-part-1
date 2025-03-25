@@ -1,6 +1,7 @@
 package com.dbenavidess.gym_part_1.infrastructure.repository.InMemory;
 
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
+import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TraineeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,9 @@ public class InMemoryTraineeRepository implements TraineeRepository {
 
     @Autowired
     private Map<UUID, Trainee> storage;
+
+    @Autowired
+    private Map<UUID, User> userStorage;
 
     @Override
     public Trainee createTrainee(Trainee trainee) {

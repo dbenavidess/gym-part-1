@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 public class InMemoryUserRepository implements UserRepository {
 
     @Autowired
-    private Map<UUID, User> storage;
+    public Map<UUID, User> storage;
 
     @Override
     public User createUser(User user) {

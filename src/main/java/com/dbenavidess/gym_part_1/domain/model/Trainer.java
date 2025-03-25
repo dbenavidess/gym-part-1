@@ -1,11 +1,14 @@
 package com.dbenavidess.gym_part_1.domain.model;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-
 @Getter
+@ToString
+@EqualsAndHashCode
 public class Trainer implements Serializable {
     private UUID id;
     private User user;
