@@ -1,11 +1,9 @@
 package com.dbenavidess.gym_part_1;
 
 import com.dbenavidess.gym_part_1.application.TrainerService;
-import com.dbenavidess.gym_part_1.config.ProjectConfig;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.model.User;
-import com.dbenavidess.gym_part_1.domain.repository.TrainerRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +18,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TrainerServiceTest {
 
     @Autowired
-    private TrainerRepository trainerRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -34,18 +29,24 @@ public class TrainerServiceTest {
         User user = new User("Daniel","Benavides",true, userRepository);
         Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
 
-        // Act
         Trainer createdTrainer = trainerService.createTrainer(trainer);
+
+        User user2 = new User("Daniel","Benavides",true, userRepository);
+        Trainer trainer2 = new Trainer(TrainingType.valueOf("zumba"), user2);
+
+        Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
 
         // Assert
         assertNotNull(createdTrainer);
-        assertEquals(trainer.getId(), createdTrainer.getId());
+        assertNotNull(createdTrainer.getId());
+        assertEquals("Daniel" + "." + "Benavides",createdTrainer.getUser().getUsername());
+        assertEquals("Daniel" + "." + "Benavides1",trainer2.getUser().getUsername());
     }
 
     @Test
     public void testCreateTrainerFailure() {
         // Arrange
-        Trainer trainer = new Trainer();
+        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), null);
 
         // Act & Assert
         Exception exception = assertThrows(RuntimeException.class, () -> {
@@ -57,34 +58,41 @@ public class TrainerServiceTest {
     @Test
     public void testUpdateTrainer() {
         // Arrange
-        Trainer trainer = new Trainer();
+        User user = new User("Daniel","Benavides",true, userRepository);
+        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
+
+        Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         // Act
-        Trainer updatedTrainer = trainerService.updateTrainer(trainer);
+
+        Trainer updatedTrainer = new Trainer(trainer.getId(),user,TrainingType.valueOf("yoga"));
+        trainerService.updateTrainer(updatedTrainer);
 
         // Assert
         assertNotNull(updatedTrainer);
-        assertEquals(trainer.getId(), updatedTrainer.getId());
+        assertNotEquals(trainer, trainerService.getTrainer(updatedTrainer.getId()));
+        assertEquals(trainerService.getTrainer(updatedTrainer.getId()).getSpecialization(), TrainingType.valueOf("yoga"));
     }
 
     @Test
     public void testGetTrainerFound() {
         // Arrange
-        UUID trainerId = UUID.randomUUID();
-        Trainer trainer = new Trainer();
+        User user = new User("Daniel","Benavides",true, userRepository);
+        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
+
+        Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         // Act
-        Trainer foundTrainer = trainerService.getTrainer(trainerId);
+        Trainer foundTrainer = trainerService.getTrainer(trainer.getId());
 
         // Assert
         assertNotNull(foundTrainer);
-        assertEquals(trainerId, foundTrainer.getId());
+        assertEquals(trainer.getId(), foundTrainer.getId());
     }
 
     @Test
     public void testGetTrainerNotFound() {
         // Arrange
-        //todo
         UUID trainerId = UUID.randomUUID();
 
         // Act
@@ -97,10 +105,16 @@ public class TrainerServiceTest {
     @Test
     public void testGetAllTrainers() {
         // Arrange
-        Trainer trainer1 = new Trainer();
-        Trainer trainer2 = new Trainer();
-        //todo initialize for every test
-        List<Trainer> trainers = List.of(trainer1, trainer2);
+        User user = new User("Daniel","Benavides",true, userRepository);
+        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
+
+        Trainer createdTrainer = trainerService.createTrainer(trainer);
+
+        User user2 = new User("Juan","Lopez",true, userRepository);
+        Trainer trainer2 = new Trainer(TrainingType.valueOf("fitness"), user2);
+
+        Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
+        List<Trainer> trainers = List.of(trainer, trainer2);
 
         // Act
         List<Trainer> result = trainerService.getAllTrainers();

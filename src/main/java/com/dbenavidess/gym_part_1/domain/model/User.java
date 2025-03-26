@@ -56,7 +56,6 @@ public class User implements Serializable {
 
     private String calculateUsername(UserRepository userRepository){
         List<User> list = userRepository.search(user -> user.username.contains(this.firstName + "." + this.lastName));
-        System.out.println(list.toString());
         int number = list.size();
         if(number > 0){
             return this.firstName + "." + this.lastName + number;

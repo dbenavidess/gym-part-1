@@ -4,12 +4,12 @@ import com.dbenavidess.gym_part_1.infrastructure.repository.InMemory.implementat
 import com.dbenavidess.gym_part_1.infrastructure.repository.InMemory.implementation.StorageSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.nio.file.Path;
 
-@Controller
+@RestController
 public class SaveController {
 
     private final StorageSerializer serializer;
@@ -17,14 +17,14 @@ public class SaveController {
     @Autowired
     private InMemoryStorage storage;
 
-    @Value("${application.storagePath}")
-    private Path path;
+    Path path;
 
-    public SaveController() {
+    public SaveController(@Value("${application.storagePath}") Path path) {
+        this.path = path;
         serializer = new StorageSerializer(path);
     }
 
-    @GetMapping
+    @GetMapping("/save")
     public void save(){
         serializer.serializeStorage(storage);
 

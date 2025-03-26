@@ -1,7 +1,6 @@
 package com.dbenavidess.gym_part_1.infrastructure.repository.InMemory;
 
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
-import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TrainerRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,9 @@ public class InMemoryTrainerRepository implements TrainerRepository {
 
     @Override
     public Trainer createTrainer(Trainer trainer) {
-        if (storage.containsKey(trainer.getId())){
+        if (storage.containsKey(trainer.getId())
+        || trainer.getUser() == null
+        || trainer.getSpecialization() == null){
             return null;
         }
         userRepository.createUser(trainer.getUser());
@@ -33,7 +34,7 @@ public class InMemoryTrainerRepository implements TrainerRepository {
 
     @Override
     public Trainer updateTrainer(Trainer trainer) {
-        userRepository.createUser(trainer.getUser());
+        userRepository.updateUser(trainer.getUser());
         storage.put(trainer.getId(),trainer);
         return storage.get(trainer.getId());
     }

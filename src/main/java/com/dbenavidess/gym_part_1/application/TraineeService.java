@@ -1,14 +1,12 @@
 package com.dbenavidess.gym_part_1.application;
 
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
-import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TraineeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -16,16 +14,13 @@ public class TraineeService {
     @Autowired
     TraineeRepository repository;
 
-    @Autowired
-    private Map<UUID, User> userStorage;
-
     private static final Logger logger = LoggerFactory.getLogger(TraineeService.class);
 
 
     public Trainee createTrainee(Trainee trainee){
 
         Trainee res = repository.createTrainee(trainee);
-        if (res == null){
+        if (res == null || trainee.getUser() == null){
             logger.error("Failed to create trainee: {}", trainee);
             throw new RuntimeException("Invalid Trainee");
         }

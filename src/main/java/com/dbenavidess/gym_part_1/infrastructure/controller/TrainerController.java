@@ -20,7 +20,6 @@ import java.util.UUID;
 public class TrainerController {
 
     private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
-
     private final TrainerService service;
     private UserRepository userRepository;
 
@@ -70,13 +69,4 @@ public class TrainerController {
         this.userRepository = repository;
     }
 
-//    @DeleteMapping("/trainer/{id}")
-//    public ResponseEntity<String> deleteTrainer(@PathVariable UUID id){
-//        try{
-//            service.deleteTrainer(id);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        }catch (Exception e){
-//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
 }

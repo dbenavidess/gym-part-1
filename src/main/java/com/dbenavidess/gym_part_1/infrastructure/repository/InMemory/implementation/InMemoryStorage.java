@@ -4,12 +4,12 @@ import com.dbenavidess.gym_part_1.domain.model.*;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -24,21 +24,31 @@ public class InMemoryStorage {
     @Value("${application.storagePath}")
     private Path path;
 
-    @Autowired
-    public void setTrainerStorage(Map<UUID,Trainer> trainerStorage){
-        storage.put(Trainer.class.getName(),trainerStorage);
+    public InMemoryStorage() {
+        storage.put(Trainer.class.getName(), new HashMap<UUID, Trainer>());
+        storage.put(Trainee.class.getName(), new HashMap<UUID, Trainee>());
+        storage.put(Training.class.getName(), new HashMap<UUID, Training>());
+        storage.put(User.class.getName(), new HashMap<UUID, User>());
     }
-    @Autowired
-    public void setTraineeStorage(Map<UUID, Trainee> traineeStorage){
-        storage.put(Trainee.class.getName(),traineeStorage);
+
+    @Bean("trainerStorage")
+    public Map<UUID, Trainer> trainerStorage(){
+        return storage.get(Trainer.class.getName());
     }
-    @Autowired
-    public void setTrainingStorage(Map<UUID, Training> trainingStorage){
-        storage.put(Training.class.getName(),trainingStorage);
+
+    @Bean("traineeStorage")
+    public Map<UUID, Trainee> traineeStorage(){
+        return storage.get(Trainee.class.getName());
     }
-    @Autowired
-    public void setUserStorage(Map<UUID, User> userStorage){
-        storage.put(Training.class.getName(),userStorage);
+
+    @Bean("trainingStorage")
+    public Map<UUID, Training> trainingStorage(){
+        return storage.get(Training.class.getName());
+    }
+
+    @Bean("userStorage")
+    public Map<UUID, User> userStorage(){
+        return storage.get(User.class.getName());
     }
 
     @PostConstruct
@@ -63,7 +73,7 @@ public class InMemoryStorage {
                         UUID id  = t.getId();
                         String name = t.getName();
                         TrainingType type = t.getType();
-                        Date date = t.getDate();
+                        LocalDate date = t.getDate();
                         int duration = t.getDuration();
                         Training training = new Training(id,
                                 trainer,
@@ -87,14 +97,13 @@ public class InMemoryStorage {
                         storage.get(User.class.getName()).put(user.getId(),user);
                         UUID id = t.getId();
                         String address = t.getAddress();
-                        Date dateOfBirth = t.getDateOfBirth();
+                        LocalDate dateOfBirth = t.getDateOfBirth();
                         Trainee trainee = new Trainee(
                                 id,
                                 user,
                                 address,
                                 dateOfBirth);
                         storage.get(Trainee.class.getName()).put(trainee.getId(),trainee);
-
                     }));
             return null;
         });
@@ -115,7 +124,6 @@ public class InMemoryStorage {
                                 specialization
                         );
                         storage.get(Trainer.class.getName()).put(trainer.getId(),trainer);
-
                     }));
             return null;
         });

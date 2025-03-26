@@ -11,12 +11,15 @@ import java.util.UUID;
 import java.util.function.Predicate;
 @Repository
 public class InMemoryTrainingRepository implements TrainingRepository {
+
     @Autowired
     private Map<UUID, Training> storage;
 
     @Override
     public Training createTraining(Training training) {
-        if (storage.containsKey(training.getId())){
+        if (storage.containsKey(training.getId())
+                || training.getTrainer() == null
+                || training.getTrainee() == null){
             return null;
         }
         storage.put(training.getId(),training);
@@ -25,7 +28,8 @@ public class InMemoryTrainingRepository implements TrainingRepository {
 
     @Override
     public Training updateTraining(Training training) {
-        return storage.put(training.getId(),training);
+        storage.put(training.getId(),training);
+        return storage.get(training.getId());
     }
 
     @Override

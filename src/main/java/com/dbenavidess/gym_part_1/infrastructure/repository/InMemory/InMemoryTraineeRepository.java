@@ -3,6 +3,7 @@ package com.dbenavidess.gym_part_1.infrastructure.repository.InMemory;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TraineeRepository;
+import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,18 +20,24 @@ public class InMemoryTraineeRepository implements TraineeRepository {
     @Autowired
     private Map<UUID, User> userStorage;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public Trainee createTrainee(Trainee trainee) {
-        if (storage.containsKey(trainee.getId())){
+        if (storage.containsKey(trainee.getId()) || trainee.getUser() == null){
             return null;
         }
+        userRepository.createUser(trainee.getUser());
         storage.put(trainee.getId(),trainee);
         return storage.get(trainee.getId());
     }
 
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        return storage.replace(trainee.getId(),trainee);
+        userRepository.updateUser(trainee.getUser());
+        storage.put(trainee.getId(),trainee);
+        return storage.get(trainee.getId());
     }
 
     @Override
