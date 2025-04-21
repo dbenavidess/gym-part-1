@@ -1,9 +1,11 @@
 package com.dbenavidess.gym_part_1.infrastructure.repository.InMemory;
 
+import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.repository.TrainerRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @Repository
+@ConditionalOnProperty(name = "spring.application.persistence", havingValue = "inmemory")
 public class InMemoryTrainerRepository implements TrainerRepository {
 
     @Autowired
@@ -50,14 +53,17 @@ public class InMemoryTrainerRepository implements TrainerRepository {
     }
 
     @Override
-    public List<Trainer> search(Predicate<Trainer> p){
-        return storage.values().stream()
-                .filter(p)
-                .toList();
+    public Trainer getByUsername(String username) {
+        return null;
     }
 
     @Override
     public List<Trainer> getAllTrainers() {
         return storage.values().stream().toList();
+    }
+
+    @Override
+    public List<Trainee> addTraineeToTrainer(UUID traineeId, UUID trainerId) {
+        return List.of();
     }
 }

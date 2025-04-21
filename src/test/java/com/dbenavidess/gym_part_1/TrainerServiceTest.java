@@ -2,8 +2,8 @@ package com.dbenavidess.gym_part_1;
 
 import com.dbenavidess.gym_part_1.application.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
-import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.model.User;
+import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,30 +23,34 @@ public class TrainerServiceTest {
     @Autowired
     private TrainerService trainerService;
 
+    @Autowired
+    private TrainingTypeRepository trainingTypeRepository;
+
     @Test
     public void testCreateTrainerSuccess() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
-
+        Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         User user2 = new User("Daniel","Benavides",true, userRepository);
-        Trainer trainer2 = new Trainer(TrainingType.valueOf("zumba"), user2);
-
+        Trainer trainer2 = new Trainer(trainingTypeRepository.getByName("fitness"), user2);
         Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
 
         // Assert
         assertNotNull(createdTrainer);
         assertNotNull(createdTrainer.getId());
         assertEquals("Daniel" + "." + "Benavides",createdTrainer.getUser().getUsername());
-        assertEquals("Daniel" + "." + "Benavides1",trainer2.getUser().getUsername());
+        assertEquals("Daniel" + "." + "Benavides1",createdTrainer2.getUser().getUsername());
+
+        trainerService.deleteTrainer(createdTrainer.getId());
+        trainerService.deleteTrainer(createdTrainer2.getId());
     }
 
     @Test
     public void testCreateTrainerFailure() {
         // Arrange
-        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), null);
+        Trainer trainer = new Trainer(trainingTypeRepository.getByName("fitness"), null);
 
         // Act & Assert
         Exception exception = assertThrows(RuntimeException.class, () -> {
@@ -59,27 +63,27 @@ public class TrainerServiceTest {
     public void testUpdateTrainer() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
-
+        Trainer trainer = new Trainer(trainingTypeRepository.getByName("resistance"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         // Act
 
-        Trainer updatedTrainer = new Trainer(trainer.getId(),user,TrainingType.valueOf("yoga"));
+        Trainer updatedTrainer = new Trainer(trainer.getId(),user,trainingTypeRepository.getByName("yoga"));
         trainerService.updateTrainer(updatedTrainer);
 
         // Assert
         assertNotNull(updatedTrainer);
-        assertNotEquals(trainer, trainerService.getTrainer(updatedTrainer.getId()));
-        assertEquals(trainerService.getTrainer(updatedTrainer.getId()).getSpecialization(), TrainingType.valueOf("yoga"));
+        assertNotEquals(createdTrainer, trainerService.getTrainer(updatedTrainer.getId()));
+        assertEquals(trainerService.getTrainer(updatedTrainer.getId()).getSpecialization().getName(), "yoga");
+
+        trainerService.deleteTrainer(createdTrainer.getId());
     }
 
     @Test
-    public void testGetTrainerFound() {
+    public void testGetTrainer() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
-
+        Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         // Act
@@ -87,7 +91,10 @@ public class TrainerServiceTest {
 
         // Assert
         assertNotNull(foundTrainer);
-        assertEquals(trainer.getId(), foundTrainer.getId());
+        assertEquals(createdTrainer.getId(), foundTrainer.getId());
+
+        trainerService.deleteTrainer(createdTrainer.getId());
+
     }
 
     @Test
@@ -106,14 +113,13 @@ public class TrainerServiceTest {
     public void testGetAllTrainers() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer trainer = new Trainer(TrainingType.valueOf("zumba"), user);
-
+        Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         User user2 = new User("Juan","Lopez",true, userRepository);
-        Trainer trainer2 = new Trainer(TrainingType.valueOf("fitness"), user2);
-
+        Trainer trainer2 = new Trainer(trainingTypeRepository.getByName("zumba"), user2);
         Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
+
         List<Trainer> trainers = List.of(trainer, trainer2);
 
         // Act
@@ -122,5 +128,26 @@ public class TrainerServiceTest {
         // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
+
+        trainerService.deleteTrainer(createdTrainer.getId());
+        trainerService.deleteTrainer(createdTrainer2.getId());
+    }
+
+    @Test
+    public void testGetTrainerByUsername(){
+
+        // Arrange
+        User user = new User("Daniel","Benavides",true, userRepository);
+        Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
+        Trainer createdTrainer = trainerService.createTrainer(trainer);
+
+        // Act
+        Trainer foundTrainer = trainerService.getTrainerByUsername(trainer.getUser().getUsername());
+
+        // Assert
+        assertEquals(createdTrainer.getId(), foundTrainer.getId());
+
+        trainerService.deleteTrainer(trainer.getId());
+
     }
 }

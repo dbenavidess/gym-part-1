@@ -5,16 +5,18 @@ import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 @Component
+@ConditionalOnProperty(name = "spring.application.persistence", havingValue = "inmemory")
 public class InMemoryStorage {
 
     @Setter
@@ -73,7 +75,7 @@ public class InMemoryStorage {
                         UUID id  = t.getId();
                         String name = t.getName();
                         TrainingType type = t.getType();
-                        LocalDate date = t.getDate();
+                        Date date = t.getDate();
                         int duration = t.getDuration();
                         Training training = new Training(id,
                                 trainer,
@@ -97,12 +99,12 @@ public class InMemoryStorage {
                         storage.get(User.class.getName()).put(user.getId(),user);
                         UUID id = t.getId();
                         String address = t.getAddress();
-                        LocalDate dateOfBirth = t.getDateOfBirth();
+                        Date dateOfBirth = t.getDateOfBirth();
                         Trainee trainee = new Trainee(
                                 id,
-                                user,
                                 address,
-                                dateOfBirth);
+                                dateOfBirth,
+                                user);
                         storage.get(Trainee.class.getName()).put(trainee.getId(),trainee);
                     }));
             return null;

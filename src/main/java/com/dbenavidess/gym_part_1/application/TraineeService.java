@@ -1,12 +1,14 @@
 package com.dbenavidess.gym_part_1.application;
 
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
+import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.repository.TraineeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -47,6 +49,33 @@ public class TraineeService {
             logger.info("Successfully retrieved trainee: {}", trainee);
         }
         return trainee;
+    }
+
+    public Trainee getTraineeByUsername(String username){
+        Trainee trainee = repository.getByUsername(username);
+        if (trainee == null) {
+            logger.warn("Trainee with Username {} not found", username);
+        } else {
+            logger.info("Successfully retrieved trainee: {}", trainee);
+        }
+        return trainee;
+    }
+
+    public List<Trainer> getTrainerList(Trainee trainee){
+        return repository.getTrainers(trainee);
+    }
+
+    public List<Trainer> getNotAssignedTrainerList(Trainee trainee){
+        return repository.getNotAssignedTrainers(trainee);
+    }
+
+    public void deleteByUsername(String username){
+        repository.deleteByUsername(username);
+        logger.info("Successfully deleted trainee with username: {}", username);
+    }
+
+    public List<Trainer> addTrainerToTrainee(Trainee trainee, Trainer trainer) {
+        return repository.addTrainerToTrainee(trainee.getId(),trainer.getId());
     }
 
 }

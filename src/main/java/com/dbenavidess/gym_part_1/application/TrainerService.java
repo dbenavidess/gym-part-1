@@ -48,7 +48,22 @@ public class TrainerService {
         return trainee;
     }
 
+    public Trainer getTrainerByUsername(String username){
+
+        Trainer trainee = repository.getByUsername(username);
+        if (trainee == null) {
+            logger.warn("Trainee with username {} not found", username);
+        } else {
+            logger.info("Successfully retrieved trainee: {}", trainee);
+        }
+        return trainee;
+    }
+
     public List<Trainer> getAllTrainers(){
         return repository.getAllTrainers();
+    }
+
+    public void deleteTrainer(UUID id) {
+        repository.deleteTrainer(id);
     }
 }

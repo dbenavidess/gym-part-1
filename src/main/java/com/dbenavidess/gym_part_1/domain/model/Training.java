@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.UUID;
 
 @Getter
@@ -17,13 +17,13 @@ public class Training implements Serializable {
     private Trainee trainee;
     private String name;
     private TrainingType type;
-    private LocalDate date;
+    private Date date;
     private int duration;
 
     public Training() {
     }
 
-    public Training(Trainer trainer, Trainee trainee, String name, TrainingType type, LocalDate date, int duration) {
+    public Training(Trainer trainer, Trainee trainee, String name, TrainingType type, Date date, int duration) {
         this.id = UUID.randomUUID();
         this.trainer = trainer;
         this.trainee = trainee;
@@ -33,7 +33,7 @@ public class Training implements Serializable {
         this.duration = duration;
     }
 
-    public Training(UUID id, Trainer trainer, Trainee trainee, String name, TrainingType type, LocalDate date, int duration) {
+    public Training(UUID id, Trainer trainer, Trainee trainee, String name, TrainingType type, Date date, int duration) {
         this.id = id;
         this.trainer = trainer;
         this.trainee = trainee;

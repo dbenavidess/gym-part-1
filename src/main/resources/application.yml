@@ -1,11 +1,27 @@
 server:
   port: 8080
+
 application:
   name: "gym-part-1"
   storagePath: "./storage.txt"
+
 spring:
+  application:
+    name: "gym-part-1"
+    persistence: "mysql" #inmemory
+
   profiles:
     active: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: admin
+    url: jdbc:mysql://localhost:3306/gym_crm
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto:  update #create-drop
+    show-sql: 'true'
+
 management:
   endpoints:
     web:

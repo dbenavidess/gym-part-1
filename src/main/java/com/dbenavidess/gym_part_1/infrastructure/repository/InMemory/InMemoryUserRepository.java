@@ -3,6 +3,7 @@ package com.dbenavidess.gym_part_1.infrastructure.repository.InMemory;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @Repository
+@ConditionalOnProperty(name = "spring.application.persistence", havingValue = "inmemory")
 public class InMemoryUserRepository implements UserRepository {
 
     @Autowired
@@ -42,10 +44,15 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> search(Predicate<User> p) {
+    public List<User> searchUsernameLike(String username) {
         return storage.values().stream()
-                .filter(p)
+                .filter(user -> user.getUsername().contains(username))
                 .toList();
+    }
+
+    @Override
+    public User searchUsername(String s) {
+        return null;
     }
 
     @Override
