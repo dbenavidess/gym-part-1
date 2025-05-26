@@ -10,8 +10,8 @@ public interface UserRepository {
     User updateUser(User user);
     void deleteUser(UUID id);
     User getUser(UUID id);
+    User getUserByUsername(String username);
 
-    List<User> getAllUsers();
     List<User> searchUsernameLike(String s);
     User searchUsername(String s);
 }

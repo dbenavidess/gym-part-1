@@ -3,13 +3,12 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
 @ToString
 @EqualsAndHashCode
-public class Trainer implements Serializable {
+public class Trainer {
     private UUID id;
     private User user;
     private TrainingType specialization;
@@ -28,4 +27,5 @@ public class Trainer implements Serializable {
         this.user = user;
         this.specialization = specialization;
     }
+
 }

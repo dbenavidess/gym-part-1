@@ -1,7 +1,6 @@
-package com.dbenavidess.gym_part_1;
+package com.dbenavidess.gym_part_1.service;
 
-import com.dbenavidess.gym_part_1.application.UserService;
-import com.dbenavidess.gym_part_1.domain.model.Trainer;
+import com.dbenavidess.gym_part_1.application.service.UserService;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ public class UserServiceTest {
         User createdUser = repository.createUser(user);
 
         // Act
-        userService.changeActiveStatus(createdUser.getId());
+        userService.changeActiveStatus(createdUser.getUsername());
         User foundUser = repository.searchUsername(user.getUsername());
 
         //Assert
@@ -59,8 +58,8 @@ public class UserServiceTest {
         User user = new User("Daniel","Benavides",true, repository);
         User createdUser = repository.createUser(user);
 
-        // Act+
-        userService.changePassword(createdUser.getId(),"NewPassword");
+        // Act
+        userService.changePassword(createdUser.getUsername(), createdUser.getPassword(), "NewPassword");
         User foundUser = repository.searchUsername(user.getUsername());
         //Assert
         assertEquals("NewPassword",foundUser.getPassword());

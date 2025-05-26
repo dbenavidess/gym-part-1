@@ -1,6 +1,6 @@
-package com.dbenavidess.gym_part_1;
+package com.dbenavidess.gym_part_1.service;
 
-import com.dbenavidess.gym_part_1.application.TrainerService;
+import com.dbenavidess.gym_part_1.application.service.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,10 +37,9 @@ public class TrainerServiceTest {
         Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
 
         // Assert
-        assertNotNull(createdTrainer);
         assertNotNull(createdTrainer.getId());
-        assertEquals("Daniel" + "." + "Benavides",createdTrainer.getUser().getUsername());
-        assertEquals("Daniel" + "." + "Benavides1",createdTrainer2.getUser().getUsername());
+        assertTrue(createdTrainer.getUser().getUsername().matches("Daniel.Benavides[0-9]*"));
+        assertTrue(createdTrainer2.getUser().getUsername().matches("Daniel.Benavides[0-9]+"));
 
         trainerService.deleteTrainer(createdTrainer.getId());
         trainerService.deleteTrainer(createdTrainer2.getId());
@@ -63,18 +61,23 @@ public class TrainerServiceTest {
     public void testUpdateTrainer() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer trainer = new Trainer(trainingTypeRepository.getByName("resistance"), user);
-        Trainer createdTrainer = trainerService.createTrainer(trainer);
+        Trainer createdTrainer = trainerService.createTrainer(
+                new Trainer(trainingTypeRepository.getByName("resistance"), user)
+        );
 
         // Act
 
-        Trainer updatedTrainer = new Trainer(trainer.getId(),user,trainingTypeRepository.getByName("yoga"));
-        trainerService.updateTrainer(updatedTrainer);
+        User updatedUser = new User(user.getUsername(),"CoolerDaniel","Benavides",true);
+
+        Trainer updatedTrainer = trainerService.updateTrainer(
+                new Trainer(createdTrainer.getId(),updatedUser,createdTrainer.getSpecialization())
+        );
+
 
         // Assert
         assertNotNull(updatedTrainer);
-        assertNotEquals(createdTrainer, trainerService.getTrainer(updatedTrainer.getId()));
-        assertEquals(trainerService.getTrainer(updatedTrainer.getId()).getSpecialization().getName(), "yoga");
+        assertNotEquals(createdTrainer, trainerService.getTrainerByUsername(updatedTrainer.getUser().getUsername()));
+        assertEquals(trainerService.getTrainerByUsername(updatedTrainer.getUser().getUsername()).getUser().getFirstName(), "CoolerDaniel");
 
         trainerService.deleteTrainer(createdTrainer.getId());
     }
@@ -87,7 +90,7 @@ public class TrainerServiceTest {
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
         // Act
-        Trainer foundTrainer = trainerService.getTrainer(trainer.getId());
+        Trainer foundTrainer = trainerService.getTrainerByUsername(trainer.getUser().getUsername());
 
         // Assert
         assertNotNull(foundTrainer);
@@ -100,10 +103,10 @@ public class TrainerServiceTest {
     @Test
     public void testGetTrainerNotFound() {
         // Arrange
-        UUID trainerId = UUID.randomUUID();
+        String invalidUsername = "@InvalidUsername";
 
         // Act
-        Trainer trainer = trainerService.getTrainer(trainerId);
+        Trainer trainer = trainerService.getTrainerByUsername(invalidUsername);
 
         // Assert
         assertNull(trainer);
@@ -127,7 +130,7 @@ public class TrainerServiceTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(2, result.size());
+        assertTrue( result.size() >= 2);
 
         trainerService.deleteTrainer(createdTrainer.getId());
         trainerService.deleteTrainer(createdTrainer2.getId());

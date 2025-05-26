@@ -1,7 +1,7 @@
-package com.dbenavidess.gym_part_1;
+package com.dbenavidess.gym_part_1.service;
 
-import com.dbenavidess.gym_part_1.application.TraineeService;
-import com.dbenavidess.gym_part_1.application.TrainerService;
+import com.dbenavidess.gym_part_1.application.service.TraineeService;
+import com.dbenavidess.gym_part_1.application.service.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.User;
@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,21 +35,18 @@ public class TraineeServiceTest {
     public void testCreateTraineeSuccess() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
-        Trainee createdTrainee = traineeService.createTrainee(trainee);
+        Trainee createdTrainee = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
         User user2 = new User("Daniel","Benavides",true, userRepository);
-        Trainee trainee2 = new Trainee("my house", Date.valueOf("1997-07-19"), user2);
-        Trainee createdTrainee2 = traineeService.createTrainee(trainee2);
+        Trainee createdTrainee2 = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user2));
 
         // Assert
         assertNotNull(createdTrainee);
-        assertNotNull(createdTrainee.getId());
-        assertEquals("Daniel" + "." + "Benavides",createdTrainee.getUser().getUsername());
-        assertEquals("Daniel" + "." + "Benavides1",createdTrainee2.getUser().getUsername());
+        assertNotNull(createdTrainee2);
+        assertTrue(createdTrainee2.getUser().getUsername().matches("Daniel.Benavides[0-9]*"));
 
-        traineeService.deleteTrainee(trainee.getId());
-        traineeService.deleteTrainee(trainee2.getId());
+        traineeService.deleteTrainee(createdTrainee.getId());
+        traineeService.deleteTrainee(createdTrainee2.getId());
     }
 
     @Test
@@ -69,18 +65,16 @@ public class TraineeServiceTest {
     public void testUpdateTrainee() {
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
-        Trainee createdTrainee = traineeService.createTrainee(trainee);
+        Trainee createdTrainee = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
         // Act
-
-        Trainee updatedTrainee = new Trainee(trainee.getId(),"new address",trainee.getDateOfBirth(),user);
+        Trainee updatedTrainee = new Trainee(createdTrainee.getId(),"new address",createdTrainee.getDateOfBirth(),user);
         traineeService.updateTrainee(updatedTrainee);
 
         // Assert
         assertNotNull(updatedTrainee);
-        assertNotEquals(createdTrainee, traineeService.getTrainee(updatedTrainee.getId()));
-        assertEquals(traineeService.getTrainee(updatedTrainee.getId()).getAddress(), "new address" );
+        assertNotEquals(createdTrainee, traineeService.getTraineeByUsername(updatedTrainee.getUser().getUsername()));
+        assertEquals(traineeService.getTraineeByUsername(updatedTrainee.getUser().getUsername()).getAddress(), "new address" );
 
         traineeService.deleteTrainee(createdTrainee.getId());
     }
@@ -93,7 +87,7 @@ public class TraineeServiceTest {
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
         // Act
-        Trainee foundTrainee = traineeService.getTrainee(trainee.getId());
+        Trainee foundTrainee = traineeService.getTraineeByUsername(trainee.getUser().getUsername());
 
         // Assert
         assertNotNull(foundTrainee);
@@ -105,10 +99,10 @@ public class TraineeServiceTest {
     @Test
     public void testGetTraineeNotFound() {
         // Arrange
-        UUID traineeId = UUID.randomUUID();
+        String invalidUsername = "@InvalidUsername";
 
         // Act
-        Trainee trainee = traineeService.getTrainee(traineeId);
+        Trainee trainee = traineeService.getTraineeByUsername(invalidUsername);
 
         // Assert
         assertNull(trainee);
@@ -125,7 +119,7 @@ public class TraineeServiceTest {
         traineeService.deleteTrainee(trainee.getId());
 
         // Assert
-        assertNull(traineeService.getTrainee(createdTrainee.getId()));
+        assertNull(traineeService.getTraineeByUsername(createdTrainee.getUser().getUsername()));
 
     }
 
@@ -151,18 +145,17 @@ public class TraineeServiceTest {
     public void testGetNotAssignedTrainerList(){
         // Arrange
         User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
-        Trainee createdTrainee = traineeService.createTrainee(trainee);
+        Trainee createdTrainee = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
         User user2 = new User("John","Wick",true, userRepository);
-        Trainer trainer = new Trainer(typeRepository.getByName("resistance"), user2);
-        Trainer createdTrainer = trainerService.createTrainer(trainer);
+        Trainer createdTrainer = trainerService.createTrainer(new Trainer(typeRepository.getByName("resistance"), user2));
 
         User user3 = new User("Tony","Hawk",true, userRepository);
-        Trainer trainer2 = new Trainer(typeRepository.getByName("fitness"), user3);
-        Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
+        Trainer createdTrainer2 = trainerService.createTrainer(new Trainer(typeRepository.getByName("fitness"), user3));
 
-        List<Trainer> trainers = traineeService.addTrainerToTrainee(createdTrainee,createdTrainer);
+        List<Trainer> trainers = traineeService.updateTraineeTrainerList(
+                List.of(createdTrainer.getUser().getUsername(),createdTrainer2.getUser().getUsername()),
+                createdTrainee.getUser().getUsername());
 
 
         // Act
@@ -173,7 +166,7 @@ public class TraineeServiceTest {
         assertNotEquals(traineeService.getNotAssignedTrainerList(foundTrainee),null);
         assertFalse(trainers.contains(createdTrainer2));
 
-        traineeService.deleteTrainee(trainee.getId());
+        traineeService.deleteTrainee(createdTrainee.getId());
         trainerService.deleteTrainer(createdTrainer.getId());
         trainerService.deleteTrainer(createdTrainer2.getId());
 

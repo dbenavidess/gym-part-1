@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,8 +31,10 @@ public class TrainingTypeJpaRepository implements TrainingTypeRepository {
     }
 
     @Override
-    public TrainingType createTrainingType(TrainingType type) {
-        return repository.save(TrainingTypeEntity.of(type)).toDomain();
+    public List<TrainingType> getAll() {
+        return repository.findAll().stream()
+                .map(TrainingTypeEntity::toDomain)
+                .toList();
     }
 
     @PostConstruct

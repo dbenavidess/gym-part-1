@@ -4,14 +4,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.io.Serializable;
 import java.sql.Date;
 import java.util.UUID;
 
 @Getter
 @ToString
 @EqualsAndHashCode
-public class Training implements Serializable {
+public class Training {
     private UUID id;
     private Trainer trainer;
     private Trainee trainee;

@@ -14,8 +14,17 @@ import java.util.UUID;
 @Repository
 public interface TraineeEntityJpaRepository extends JpaRepository<TraineeEntity, UUID>{
     Optional<TraineeEntity> findByUser_Username(String username);
-    @Query("SELECT t FROM TrainerEntity t WHERE t.id NOT IN (" +
-            "SELECT tt.id FROM TrainerEntity tt JOIN tt.trainees tr WHERE tr.id = :traineeId)")
+    @Query("""
+        SELECT t 
+        FROM TrainerEntity t 
+        WHERE t.user.isActive = true 
+        AND t.id NOT IN (
+            SELECT tt.id 
+            FROM TrainerEntity tt 
+            JOIN tt.trainees tr 
+            WHERE tr.id = :traineeId
+        )
+    """)
     List<TrainerEntity> findAllNotAssignedToTrainee(@Param("traineeId") UUID traineeId);
 
 }

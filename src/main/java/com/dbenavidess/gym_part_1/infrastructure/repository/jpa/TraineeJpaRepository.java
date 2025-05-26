@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 public class TraineeJpaRepository implements TraineeRepository {
@@ -44,11 +45,15 @@ public class TraineeJpaRepository implements TraineeRepository {
     @Transactional()
     @Override
     public Trainee updateTrainee(Trainee trainee) {
-        TraineeEntity traineeEntity = repository.findById(trainee.getId()).orElseThrow();
-        traineeEntity.setAddress(trainee.getAddress());
-        traineeEntity.setDateOfBirth(trainee.getDateOfBirth());
+        TraineeEntity traineeEntity = repository.findByUser_Username(trainee.getUser().getUsername()).orElseThrow();
+        if (trainee.getAddress() != null && !trainee.getAddress().isEmpty()){
+            traineeEntity.setAddress(trainee.getAddress());
+        }
+        if (trainee.getDateOfBirth() != null){
+            traineeEntity.setDateOfBirth(trainee.getDateOfBirth());
+        }
 
-        userRepository.updateUser(traineeEntity.getUser().toDomain());
+        userRepository.updateUser(trainee.getUser());
 
         return repository.save(traineeEntity).toDomain();
     }
@@ -64,24 +69,12 @@ public class TraineeJpaRepository implements TraineeRepository {
     }
 
     @Override
-    public Trainee getTrainee(UUID id) {
-        Optional<TraineeEntity> opt = repository.findById(id);
-        return opt.map(TraineeEntity::toDomain).orElse(null);
-    }
-
-    @Override
+    @Transactional
     public Trainee getByUsername(String username) {
         Optional<TraineeEntity> opt = repository.findByUser_Username(username);
         return opt.map(TraineeEntity::toDomain).orElse(null);
     }
 
-    @Override
-    public List<Trainee> getAllTrainees() {
-        return repository.findAll()
-                .stream()
-                .map(TraineeEntity::toDomain)
-                .toList();
-    }
 
     @Override
     public List<Trainer> getTrainers(Trainee trainee) {
@@ -94,18 +87,14 @@ public class TraineeJpaRepository implements TraineeRepository {
 
     @Override
     @Transactional
-    public List<Trainer> addTrainerToTrainee(UUID traineeId, UUID trainerId) {
-        TraineeEntity trainee = repository.findById(traineeId).orElseThrow();
-        TrainerEntity trainer = trainerEntityJpaRepository.findById(trainerId).orElseThrow();
+    public List<Trainer> updateTraineeTrainerList(List<String> trainers, Trainee trainee) {
+        TraineeEntity entity = repository.findById(trainee.getId()).orElseThrow();
+        entity.setTrainers(trainers.stream()
+                .map(trainerUsername -> trainerEntityJpaRepository.findByUser_Username(trainerUsername).orElseThrow())
+                .collect(Collectors.toList()));
+        entity = repository.save(entity);
 
-        trainee.getTrainers().add(trainer);
-        trainer.getTrainees().add(trainee);
-
-        repository.save(trainee);
-        trainerEntityJpaRepository.save(trainer);
-
-        return trainee.getTrainers()
-                .stream()
+        return entity.getTrainers().stream()
                 .map(TrainerEntity::toDomain)
                 .toList();
     }

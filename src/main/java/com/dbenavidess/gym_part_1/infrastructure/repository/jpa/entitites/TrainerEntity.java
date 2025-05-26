@@ -52,8 +52,9 @@ public class TrainerEntity {
     }
 
     public Trainer toDomain(){
-        return new Trainer(this.id,
+        Trainer res = new Trainer(this.id,
                 this.user.toDomain(),
                 this.specialization.toDomain());
+        return res;
     }
 }

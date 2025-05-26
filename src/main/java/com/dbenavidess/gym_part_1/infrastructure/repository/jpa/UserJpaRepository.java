@@ -25,11 +25,13 @@ public class UserJpaRepository implements UserRepository {
 
     @Override
     public User updateUser(User user) {
-        UserEntity userEntity = repository.findById(user.getId()).orElseThrow();
+        UserEntity userEntity = repository.findByUsername(user.getUsername()).orElseThrow();
         userEntity.setActive(user.getIsActive());
         userEntity.setFirstName(user.getFirstName());
         userEntity.setLastName(user.getLastName());
-        userEntity.setPassword(user.getPassword());
+        if (user.getPassword() != null && !user.getPassword().isEmpty()){
+            userEntity.setPassword(user.getPassword());
+        }
         repository.save(userEntity);
         return repository.save(userEntity).toDomain();
     }
@@ -46,8 +48,9 @@ public class UserJpaRepository implements UserRepository {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return repository.findAll().stream().map(UserEntity::toDomain).toList();
+    public User getUserByUsername(String username) {
+        Optional<UserEntity> opt = repository.findByUsername(username);
+        return opt.map(UserEntity::toDomain).orElse(null);
     }
 
     @Override

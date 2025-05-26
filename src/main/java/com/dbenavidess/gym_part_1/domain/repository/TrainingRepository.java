@@ -14,6 +14,5 @@ public interface TrainingRepository {
     void deleteTraining(UUID id);
     Training getTraining(UUID id);
 
-    List<Training> getAllTrainings();
     List<Training> searchTrainings(Date from, Date to, Trainer trainer, Trainee trainee, TrainingType type);
 }

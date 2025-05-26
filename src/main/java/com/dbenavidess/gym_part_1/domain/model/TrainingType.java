@@ -5,8 +5,12 @@ import lombok.Getter;
 import java.util.UUID;
 @Getter
 public class TrainingType {
-    private final UUID id;
-    private final String name; //fitness, yoga, zumba, stretching, resistance
+    private UUID id;
+    private String name; //fitness, yoga, zumba, stretching, resistance
+
+    public TrainingType(){
+
+    }
 
     public TrainingType(UUID id, String name) {
         this.id = id;

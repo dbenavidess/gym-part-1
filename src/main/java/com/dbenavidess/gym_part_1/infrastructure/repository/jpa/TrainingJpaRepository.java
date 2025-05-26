@@ -6,7 +6,6 @@ import com.dbenavidess.gym_part_1.domain.model.Training;
 import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TrainingEntity;
-import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TrainingTypeEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TrainingEntityJpaRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.Specifications.TrainingSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +42,14 @@ public class TrainingJpaRepository implements TrainingRepository {
         return opt.map(TrainingEntity::toDomain).orElse(null);
     }
 
-    @Override
-    public List<Training> getAllTrainings() {
-        return repository.findAll().stream().map(TrainingEntity::toDomain).toList();
-    }
 
     @Override
     public List<Training> searchTrainings(Date from, Date to, Trainer trainer, Trainee trainee, TrainingType type) {
+        UUID trainerId = trainer == null? null : trainer.getId();
+        UUID traineeId = trainee == null? null : trainee.getId();
+        UUID typeId = type == null? null : type.getId();
         return repository.findAll(
-                TrainingSpecification.filter(trainer.getId(), from, to, trainee.getId(), type.getId())
+                TrainingSpecification.filter(trainerId, from, to, traineeId, typeId)
         ).stream()
                 .map(TrainingEntity::toDomain)
                 .toList();

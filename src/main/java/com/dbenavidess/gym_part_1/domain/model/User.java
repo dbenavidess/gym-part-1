@@ -1,10 +1,10 @@
 package com.dbenavidess.gym_part_1.domain.model;
 
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Random;
@@ -12,8 +12,9 @@ import java.util.UUID;
 
 @ToString
 @EqualsAndHashCode
-public class User implements Serializable {
+public class User {
     @Getter
+    @JsonIgnore
     private UUID id;
     @Getter
     private String firstName;
@@ -22,9 +23,9 @@ public class User implements Serializable {
     @Getter
     private String username;
     @Getter
+    @JsonIgnore
     private String password;
     private boolean isActive;
-
 
     public User() {
     }
@@ -36,6 +37,13 @@ public class User implements Serializable {
         this.isActive = isActive;
         this.username = calculateUsername(repository);
         this.password = calculatePassword();
+    }
+
+    public User(String username, String firstName, String lastName, boolean isActive) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.isActive = isActive;
+        this.username = username;
     }
 
     public User(UUID id, String firstName, String lastName, String username, String password, boolean isActive) {

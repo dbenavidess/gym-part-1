@@ -20,10 +20,13 @@ spring:
   jpa:
     hibernate:
       ddl-auto:  update #create-drop
-    show-sql: 'true'
+    show-sql: 'false'
 
 management:
   endpoints:
     web:
       exposure:
         include : "*"
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [%6.32X{transactionId}] %msg%n"

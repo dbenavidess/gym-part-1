@@ -1,130 +1,124 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
-import com.dbenavidess.gym_part_1.application.TraineeService;
-import com.dbenavidess.gym_part_1.application.UserService;
+import com.dbenavidess.gym_part_1.application.service.TraineeService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.dbenavidess.gym_part_1.infrastructure.request.Trainee.CreateTraineeRequest;
+import com.dbenavidess.gym_part_1.infrastructure.request.Trainee.UpdateTraineeRequest;
+import com.dbenavidess.gym_part_1.infrastructure.response.SignupResponse;
+import com.dbenavidess.gym_part_1.infrastructure.response.TraineeProfileResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.NoSuchElementException;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
+@Tag(name = "Trainees", description = "Trainee operations")
 public class TraineeController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TrainerController.class);
-
     private final TraineeService service;
-    private final UserService userService;
-    private UserRepository userRepository;
 
+    private final UserRepository userRepository;
 
-    public TraineeController(TraineeService service, UserService userService) {
+    public TraineeController(TraineeService service, UserRepository userRepository) {
         this.service = service;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
+    @Operation(summary = "Create trainee")
+    @ApiResponse(responseCode = "201", description = "Trainee created",
+            content = { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = SignupResponse.class)) })
     @PostMapping("/trainee")
-    public ResponseEntity<Trainee> createTrainee(@RequestBody Map<String,String> body){
-        boolean isActive = body.get("isActive").equals("true");
-        try{
+    public ResponseEntity<SignupResponse> createTrainee(@RequestBody CreateTraineeRequest body){
+        User user = new User(body.firstName, body.lastName, true, userRepository);
+        Trainee trainee = service.createTrainee(new Trainee(body.address,body.dateOfBirth,user));
+        SignupResponse response = new SignupResponse(trainee.getUser().getUsername(),trainee.getUser().getPassword());
+        response.add(linkTo(methodOn(TraineeController.class).getTrainee(trainee.getUser().getUsername())).withSelfRel());
 
-            User user = new User(body.get("firstName"), body.get("lastName"), isActive, userRepository);
-            Date date = Date.valueOf(body.get("dateOfBirth"));
-            Trainee trainee = new Trainee(body.get("address"),date,user);
-
-            return new ResponseEntity<>(service.createTrainee(trainee), HttpStatus.CREATED);
-        }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Update trainee")
+    @ApiResponse(responseCode = "200", description = "Trainee updated",
+            content = { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TraineeProfileResponse.class)) })
     @PutMapping("/trainee")
-    public ResponseEntity<Trainee> updateTrainee(@RequestBody Trainee trainee){
-        try{
-            return new ResponseEntity<>(service.updateTrainee(trainee), HttpStatus.OK);
-        }catch (IllegalArgumentException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<TraineeProfileResponse> updateTrainee(@RequestBody UpdateTraineeRequest body){
+        User user = new User(body.username,body.firstName, body.lastName, body.isActive);
+        Trainee trainee = service.updateTrainee(new Trainee(
+                body.address,
+                body.dateOfBirth,
+                user
+        ));
+        return new ResponseEntity<>(new TraineeProfileResponse(trainee,service.getTrainerList(trainee)), HttpStatus.OK);
     }
 
-    @GetMapping("/trainee/{id}")
-    public ResponseEntity<Trainee> getTrainee(@PathVariable UUID id){
-        Trainee trainee = service.getTrainee(id);
-        if (trainee == null){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(trainee,HttpStatus.OK);
-    }
-
-    @DeleteMapping("/trainee/{id}")
-    public ResponseEntity<String> deleteTrainer(@PathVariable UUID id){
-        try{
-            service.deleteTrainee(id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/trainee/search-username/{username}")
-    public ResponseEntity<Trainee> getTraineeByUsername(@PathVariable String username ){
+    @Operation(summary = "Get trainee")
+    @ApiResponse(responseCode = "200", description = "Get trainee by username",
+            content = { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = TraineeProfileResponse.class)) })
+    @GetMapping("/trainee/{username}")
+    public ResponseEntity<TraineeProfileResponse> getTrainee(@PathVariable String username){
         Trainee trainee = service.getTraineeByUsername(username);
         if (trainee == null){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(trainee,HttpStatus.OK);
+        return new ResponseEntity<>(new TraineeProfileResponse(trainee,service.getTrainerList(trainee)),HttpStatus.OK);
     }
 
-    @PostMapping("/trainee/login")
-    public ResponseEntity<Boolean> login(@RequestBody Map<String,String> body){
-        boolean result = userService.login(body.get("username"),body.get("password"));
-        return new ResponseEntity<>(result,HttpStatus.OK);
+    @Operation(summary = "Delete trainee")
+    @ApiResponse(responseCode = "200", description = "Delete trainee by username")
+    @DeleteMapping("/trainee/{username}")
+    public ResponseEntity<String> deleteTrainer(@PathVariable String username){
+        service.deleteByUsername(username);
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
-
-    @PostMapping("/trainee/change-password")
-    public ResponseEntity<Boolean> changePassword(@RequestBody Map<String,String> body){
-        boolean result = userService.changePassword(UUID.fromString(body.get("id")),body.get("password"));
-        return new ResponseEntity<>(result,HttpStatus.OK);
-    }
-
-    @PostMapping("/trainee/change-active")
-    public ResponseEntity<Boolean> changeActive(@RequestBody Map<String,String> body){
-        boolean result = userService.changeActiveStatus(UUID.fromString(body.get("id")));
-        return new ResponseEntity<>(result,HttpStatus.OK);
-    }
-
-    @DeleteMapping("/trainee-username/{id}")
-    public ResponseEntity<String> deleteTrainerByUsername(@PathVariable String username){
-        try{
-            service.deleteByUsername(username);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/trainee/get-not-assigned-trainers/{username}")
-    public ResponseEntity<List<Trainer>> getNotAssignedTrainerList(@PathVariable String username ){
-
+    @Operation(summary = "Get  not assigned trainer list")
+    @ApiResponse(responseCode = "200", description = "Get  not assigned trainers to trainee by username",
+            content = { @Content(mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = TraineeProfileResponse.TraineeTrainerRepr.class))) })
+    @GetMapping("/trainee/{username}/get-not-assigned-trainers")
+    public ResponseEntity<List<TraineeProfileResponse.TraineeTrainerRepr>> getNotAssignedTrainerList(@PathVariable String username){
         List<Trainer> trainers = service.getNotAssignedTrainerList(service.getTraineeByUsername(username));
-        if (trainers == null || trainers.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<>(trainers,HttpStatus.OK);
+        return new ResponseEntity<>(TraineeProfileResponse.TraineeTrainerRepr.fromTrainerList(trainers),HttpStatus.OK);
+    }
+    @Operation(summary = "Update trainee's trainer list")
+    @ApiResponse(responseCode = "200", description = "Update trainee's assigned trainers",
+            content = { @Content(mediaType = "application/json",
+                    array = @ArraySchema(schema = @Schema(implementation = TraineeProfileResponse.TraineeTrainerRepr.class))) })
+    @PutMapping("/trainee/{username}/update-trainers")
+    public ResponseEntity<List<TraineeProfileResponse.TraineeTrainerRepr>> updateTraineeTrainersList(@PathVariable String username, @RequestBody List<String> body){
+        List<TraineeProfileResponse.TraineeTrainerRepr> list = TraineeProfileResponse.TraineeTrainerRepr
+                .fromTrainerList(service.updateTraineeTrainerList(body, username));
+        return new ResponseEntity<>(list,HttpStatus.OK);
     }
 
-    @Autowired
-    void setUserRepository(UserRepository repository){
-        this.userRepository = repository;
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e){
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
     }
 
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
 }

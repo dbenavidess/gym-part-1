@@ -61,11 +61,13 @@ public class TraineeEntity {
     }
 
     public Trainee toDomain() {
-        return new Trainee(
+        Trainee res =  new Trainee(
                 this.id,
                 this.address,
                 this.dateOfBirth,
                 this.user.toDomain()
         );
+
+        return res;
     }
 }
