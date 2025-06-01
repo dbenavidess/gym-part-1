@@ -24,6 +24,9 @@ spring:
 
 management:
   endpoints:
+    health:
+        roles: "*"
+        show-details: "always"
     web:
       exposure:
         include : "*"
