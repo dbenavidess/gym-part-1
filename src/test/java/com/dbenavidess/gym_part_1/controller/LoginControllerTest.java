@@ -1,12 +1,11 @@
 package com.dbenavidess.gym_part_1.controller;
 
-import com.dbenavidess.gym_part_1.application.service.TraineeService;
+import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import com.dbenavidess.gym_part_1.infrastructure.request.Login.ChangePasswordRequest;
 import com.dbenavidess.gym_part_1.infrastructure.request.Login.LoginRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;

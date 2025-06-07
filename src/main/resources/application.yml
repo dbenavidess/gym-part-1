@@ -8,28 +8,22 @@ application:
 spring:
   application:
     name: "gym-part-1"
-    persistence: "mysql" #inmemory
 
   profiles:
-    active: dev
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: admin
-    url: jdbc:mysql://localhost:3306/gym_crm
-    password: admin
-  jpa:
-    hibernate:
-      ddl-auto:  update #create-drop
-    show-sql: 'false'
+    active: stg
 
 management:
-  endpoints:
+  endpoint:
     health:
-        roles: "*"
-        show-details: "always"
+      show-details: always
     web:
       exposure:
         include : "*"
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [%6.32X{transactionId}] %msg%n"

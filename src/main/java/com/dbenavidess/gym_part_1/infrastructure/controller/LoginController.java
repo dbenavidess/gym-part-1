@@ -1,6 +1,6 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
-import com.dbenavidess.gym_part_1.application.service.UserService;
+import com.dbenavidess.gym_part_1.service.UserService;
 import com.dbenavidess.gym_part_1.infrastructure.request.Login.ChangePasswordRequest;
 import com.dbenavidess.gym_part_1.infrastructure.request.Login.LoginRequest;
 import io.swagger.v3.oas.annotations.Operation;

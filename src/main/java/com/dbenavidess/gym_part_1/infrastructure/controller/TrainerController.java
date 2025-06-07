@@ -1,6 +1,6 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
-import com.dbenavidess.gym_part_1.application.service.TrainerService;
+import com.dbenavidess.gym_part_1.service.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.model.User;
