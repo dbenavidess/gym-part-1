@@ -1,5 +1,8 @@
 package com.dbenavidess.gym_part_1.controller;
 
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
+import com.dbenavidess.gym_part_1.infrastructure.request.Login.LoginRequest;
+import com.dbenavidess.gym_part_1.infrastructure.response.LoginResponse;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.service.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
@@ -14,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +45,36 @@ public class TrainerControllerTest {
     @Autowired
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
+    User user;
+    Trainer createdTrainer;
+    String authHeader;
+
+    @BeforeEach
+    public void createUsersAndLogin() throws JsonProcessingException {
+        user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
+        createdTrainer = service.createTrainer(
+                new Trainer(trainingTypeRepository.getByName("resistance"), user)
+        );
+        authHeader = login(
+                createdTrainer.getUser().getUsername(),
+                user.getPlainPassword());
+    }
+
+    private String login(String username, String password) throws JsonProcessingException {
+        LoginRequest request = new LoginRequest(
+                username,
+                password
+        );
+        RestAssured.baseURI = BASE_URI + "/login";
+        RequestSpecification httpRequest = RestAssured.given()
+                .header("Content-Type", "application/json")
+                .body(request);
+        LoginResponse response = mapper.readValue(httpRequest.post().asString(), LoginResponse.class);
+        return "Bearer " + response.jwtToken;
+    }
+
     @Test
     public void createTrainerTest() throws JsonProcessingException {
         //Arrange
@@ -62,10 +96,6 @@ public class TrainerControllerTest {
     @Test
     public void updateTrainerTest() throws JsonProcessingException {
         //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer createdTrainer = service.createTrainer(
-                new Trainer(trainingTypeRepository.getByName("resistance"), user)
-        );
         UpdateTrainerRequest request = new UpdateTrainerRequest(
                 createdTrainer.getUser().getUsername(),
                 "DanielModified",
@@ -76,6 +106,7 @@ public class TrainerControllerTest {
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI;
         RequestSpecification httpRequest = RestAssured.given()
                 .header("Content-Type", "application/json")
+                .header("Authorization",authHeader)
                 .body(request);
         //Act
         TrainerProfileResponse response = mapper.readValue(httpRequest.put().asString(), TrainerProfileResponse.class);
@@ -89,15 +120,11 @@ public class TrainerControllerTest {
     @Test
     public void getTrainerTest() throws JsonProcessingException {
         //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer createdTrainer = service.createTrainer(
-                new Trainer(trainingTypeRepository.getByName("resistance"), user)
-        );
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI+ "/" + createdTrainer.getUser().getUsername();
         RequestSpecification httpRequest = RestAssured.given()
-                .header("Content-Type", "application/json");
+                .header("Content-Type", "application/json")
+                .header("Authorization",authHeader);
         //Act
-        System.out.println(httpRequest.get().asString());
         TrainerProfileResponse response = mapper.readValue(httpRequest.get().asString(), TrainerProfileResponse.class);
         //Assert
         assertEquals(createdTrainer.getUser().getUsername(), response.username);

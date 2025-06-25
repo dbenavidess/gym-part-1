@@ -38,6 +38,13 @@ public class UserEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private TrainerEntity trainer;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BruteForceSecurityEntity bruteForceSecurity;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private JwtEntity jwt;
+
+
     public UserEntity(UUID id, String firstName, String lastName, String username, String password, boolean isActive) {
         this.id = id;
         this.firstName = firstName;

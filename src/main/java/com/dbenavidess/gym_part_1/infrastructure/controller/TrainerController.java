@@ -1,5 +1,8 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
+import com.dbenavidess.gym_part_1.config.security.JwtService;
+import com.dbenavidess.gym_part_1.config.security.UserDetailsModel;
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import com.dbenavidess.gym_part_1.service.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.TrainingType;
@@ -16,8 +19,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -26,13 +31,23 @@ public class TrainerController {
     private final TrainerService service;
     private final UserRepository userRepository;
     private final TrainingTypeRepository trainingTypeRepository;
+    private final PasswordEncryptionProvider passwordEncryptionProvider;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     public TrainerController(TrainerService service,
                              TrainingTypeRepository trainingTypeRepository,
-                             UserRepository userRepository){
+                             UserRepository userRepository,
+                             PasswordEncryptionProvider passwordEncryptionProvider,
+                             JwtService jwtService,
+                             AuthenticationManager authenticationManager
+                             ){
         this.service = service;
         this.trainingTypeRepository = trainingTypeRepository;
         this.userRepository = userRepository;
+        this.passwordEncryptionProvider = passwordEncryptionProvider;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
     @Operation(summary = "Create trainer")
     @ApiResponse(responseCode = "201", description = "Trainer created",
@@ -41,10 +56,11 @@ public class TrainerController {
     @PostMapping("/trainer")
     public ResponseEntity<SignupResponse> createTrainer(@RequestBody CreateTrainerRequest body){
         TrainingType type = trainingTypeRepository.getByName(body.specialization);
-        User user = new User(body.firstName, body.lastName, true, userRepository);
+        User user = new User(body.firstName, body.lastName, true, userRepository,passwordEncryptionProvider);
         Trainer trainer = service.createTrainer(new Trainer(type,user));
+        String jwt = jwtService.generateToken(new HashMap<>(),new UserDetailsModel(trainer.getUser()));
 
-        return new ResponseEntity<>(new SignupResponse(trainer.getUser().getUsername(),trainer.getUser().getPassword()), HttpStatus.CREATED);
+        return new ResponseEntity<>(new SignupResponse(trainer.getUser().getUsername(),trainer.getUser().getPassword(),jwt), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update trainer")

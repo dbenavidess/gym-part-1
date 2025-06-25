@@ -5,6 +5,7 @@ import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,13 +30,16 @@ public class TraineeServiceTest {
     @Autowired
     private TrainerService trainerService;
 
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
+
     @Test
     public void testCreateTraineeSuccess() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
-        User user2 = new User("Daniel","Benavides",true, userRepository);
+        User user2 = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee2 = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user2));
 
         // Assert
@@ -62,7 +66,7 @@ public class TraineeServiceTest {
     @Test
     public void testUpdateTrainee() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
         // Act
@@ -80,7 +84,7 @@ public class TraineeServiceTest {
     @Test
     public void testGetTraineeFound() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
@@ -109,7 +113,7 @@ public class TraineeServiceTest {
     @Test
     public void testDeleteTrainee(){
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
@@ -125,7 +129,7 @@ public class TraineeServiceTest {
     public void testGetTraineeByUsername(){
 
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 
@@ -142,13 +146,13 @@ public class TraineeServiceTest {
     @Test
     public void testGetNotAssignedTrainerList(){
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
-        User user2 = new User("John","Wick",true, userRepository);
+        User user2 = new User("John","Wick",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer = trainerService.createTrainer(new Trainer(typeRepository.getByName("resistance"), user2));
 
-        User user3 = new User("Tony","Hawk",true, userRepository);
+        User user3 = new User("Tony","Hawk",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer2 = trainerService.createTrainer(new Trainer(typeRepository.getByName("fitness"), user3));
 
         List<Trainer> trainers = traineeService.updateTraineeTrainerList(
@@ -173,7 +177,7 @@ public class TraineeServiceTest {
     @Test
     public void testDeleteByUsername(){
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainee trainee = new Trainee("my house", Date.valueOf("1997-07-19"), user);
         Trainee createdTrainee = traineeService.createTrainee(trainee);
 

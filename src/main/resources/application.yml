@@ -1,6 +1,9 @@
 server:
   port: 8080
 
+jwt:
+  expiration: 86400000
+
 application:
   name: "gym-part-1"
   storagePath: "./storage.txt"
@@ -10,7 +13,7 @@ spring:
     name: "gym-part-1"
 
   profiles:
-    active: stg
+    active: dev
 
 management:
   endpoint:

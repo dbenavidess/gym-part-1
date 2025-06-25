@@ -1,5 +1,8 @@
 package com.dbenavidess.gym_part_1.controller;
 
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
+import com.dbenavidess.gym_part_1.infrastructure.request.Login.LoginRequest;
+import com.dbenavidess.gym_part_1.infrastructure.response.LoginResponse;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.service.TrainerService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
@@ -17,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,6 +51,47 @@ public class TraineeControllerTest {
     @Autowired
     TrainingTypeRepository trainingTypeRepository;
 
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
+
+    User user;
+    Trainee createdTrainee;
+    User user2;
+    Trainer createdTrainer;
+    User user3;
+    Trainer createdTrainer2;
+    String authHeader;
+
+
+    @BeforeEach
+    public void createUsersAndLogin() throws JsonProcessingException {
+        user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
+        createdTrainee = service.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
+
+        user2 = new User("John","Wick",true, userRepository, passwordEncryptionProvider);
+        createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("resistance"), user2));
+
+        user3 = new User("Tony","Hawk",true, userRepository, passwordEncryptionProvider);
+        createdTrainer2 = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("fitness"), user3));
+
+        authHeader = login(
+                createdTrainee.getUser().getUsername(),
+                user.getPlainPassword());
+    }
+
+    private String login(String username, String password) throws JsonProcessingException {
+        LoginRequest request = new LoginRequest(
+                username,
+                password
+        );
+        RestAssured.baseURI = BASE_URI + "/login";
+        RequestSpecification httpRequest = RestAssured.given()
+                .header("Content-Type", "application/json")
+                .body(request);
+        LoginResponse response = mapper.readValue(httpRequest.post().asString(), LoginResponse.class);
+        return "Bearer " + response.jwtToken;
+    }
+
     @Test
     public void createTraineeTest() throws JsonProcessingException {
         //Arrange
@@ -54,7 +99,7 @@ public class TraineeControllerTest {
                 "Daniel",
                 "Benavides",
                 Date.valueOf("1997-07-19"),
-                "fake address"
+                "fake address for creation"
         );
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI;
         RequestSpecification httpRequest = RestAssured.given()
@@ -64,14 +109,12 @@ public class TraineeControllerTest {
         SignupResponse signupResponse = mapper.readValue(httpRequest.post().asString(), SignupResponse.class);
         //Assert
         assertNotNull(service.getTraineeByUsername(signupResponse.username));
+        assertNotNull(signupResponse.token);
 
     }
 
     @Test
     public void updateTraineeTest() throws JsonProcessingException {
-        //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee createdTrainee = service.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
 
         UpdateTraineeRequest request = new UpdateTraineeRequest(
                 createdTrainee.getUser().getUsername(),
@@ -84,6 +127,7 @@ public class TraineeControllerTest {
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI;
         RequestSpecification httpRequest = RestAssured.given()
                 .header("Content-Type", "application/json")
+                .header("Authorization", authHeader)
                 .body(request);
         //Act
         TraineeProfileResponse response = mapper.readValue(httpRequest.put().asString(), TraineeProfileResponse.class);
@@ -99,11 +143,10 @@ public class TraineeControllerTest {
     @Test
     public void getTraineeTest() throws JsonProcessingException {
         //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee createdTrainee = service.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI + "/" + createdTrainee.getUser().getUsername();
         RequestSpecification httpRequest = RestAssured.given()
-                .header("Content-Type", "application/json");
+                .header("Content-Type", "application/json")
+                .header("Authorization", authHeader);
         //Act
         TraineeProfileResponse response = mapper.readValue(httpRequest.get().asString(), TraineeProfileResponse.class);
         //Assert
@@ -114,22 +157,14 @@ public class TraineeControllerTest {
     @Test
     public void getNotAssignedTrainersTest() throws JsonProcessingException {
         //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee createdTrainee = service.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
-
-        User user2 = new User("John","Wick",true, userRepository);
-        Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("resistance"), user2));
-
-        User user3 = new User("Tony","Hawk",true, userRepository);
-        Trainer createdTrainer2 = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("fitness"), user3));
-
         List<Trainer> trainers = service.updateTraineeTrainerList(
                 List.of(createdTrainer.getUser().getUsername()),
                 createdTrainee.getUser().getUsername());
 
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI + "/" + createdTrainee.getUser().getUsername() + "/get-not-assigned-trainers";
         RequestSpecification httpRequest = RestAssured.given()
-                .header("Content-Type", "application/json");
+                .header("Content-Type", "application/json")
+                .header("Authorization", authHeader);
         //Act
         List<TraineeProfileResponse.TraineeTrainerRepr> response = mapper.readValue(httpRequest.get().asString(), new TypeReference<List<TraineeProfileResponse.TraineeTrainerRepr>>() {});
 
@@ -142,21 +177,14 @@ public class TraineeControllerTest {
     @Test
     public void updateTraineeTrainersListTest() throws JsonProcessingException {
         //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee createdTrainee = service.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
-
-        User user2 = new User("John","Wick",true, userRepository);
-        Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("resistance"), user2));
-
-        User user3 = new User("Tony","Hawk",true, userRepository);
-        Trainer createdTrainer2 = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("fitness"), user3));
-
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI + "/" + createdTrainee.getUser().getUsername() + "/update-trainers";
         RequestSpecification httpRequest = RestAssured.given()
                 .header("Content-Type", "application/json")
+                .header("Authorization", authHeader)
                 .body(List.of(createdTrainer.getUser().getUsername(),createdTrainer2.getUser().getUsername()));
         //Act
-        List<TraineeProfileResponse.TraineeTrainerRepr> response = mapper.readValue(httpRequest.put().asString(), new TypeReference<List<TraineeProfileResponse.TraineeTrainerRepr>>() {});
+        List<TraineeProfileResponse.TraineeTrainerRepr> response = mapper.readValue(httpRequest.put().asString(), new TypeReference<>() {
+        });
         //Assert
         assertEquals(2, response.size());
 
@@ -165,14 +193,13 @@ public class TraineeControllerTest {
     @Test
     public void deleteTrainee(){
         //Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainee createdTrainee = service.createTrainee(new Trainee("my house", Date.valueOf("1997-07-19"), user));
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI + "/" + createdTrainee.getUser().getUsername();
         RequestSpecification httpRequest = RestAssured.given()
-                .header("Content-Type", "application/json");
+                .header("Content-Type", "application/json")
+                .header("Authorization", authHeader);
         Response response = httpRequest.delete();
-
-        assertEquals(response.statusCode(), 200);
+        //assert
+        assertEquals( 200, response.statusCode());
     }
 
 }

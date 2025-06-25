@@ -3,6 +3,7 @@ package com.dbenavidess.gym_part_1.service;
 import com.dbenavidess.gym_part_1.domain.model.*;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,13 +32,16 @@ public class TrainingServiceTest {
     @Autowired
     private TraineeService traineeService;
 
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
+
     @Test
     public void testCreateTrainingSuccess() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("zumba"), user));
 
-        User user2 = new User("Juan","Lopez",true, userRepository);
+        User user2 = new User("Juan","Lopez",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("Juan's address", Date.valueOf("1990-08-10"), user2));
 
         Training training = new Training(createdTrainer,
@@ -82,10 +86,10 @@ public class TrainingServiceTest {
     @Test
     public void testGetTrainingFound() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("zumba"), user));
 
-        User user2 = new User("Juan","Lopez",true, userRepository);
+        User user2 = new User("Juan","Lopez",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("Juan's address", Date.valueOf("1990-08-10"), user2));
 
         Training createdTraining = trainingService.createTraining(
@@ -121,10 +125,10 @@ public class TrainingServiceTest {
     public void testSearchTrainings(){
 
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("zumba"), user));
 
-        User user2 = new User("Juan","Lopez",true, userRepository);
+        User user2 = new User("Juan","Lopez",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("Juan's address", Date.valueOf("1990-08-10"), user2));
 
         Training createdTraining = trainingService.createTraining(

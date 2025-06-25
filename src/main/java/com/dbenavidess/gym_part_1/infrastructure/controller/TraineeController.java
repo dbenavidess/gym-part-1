@@ -1,5 +1,8 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
+import com.dbenavidess.gym_part_1.config.security.JwtService;
+import com.dbenavidess.gym_part_1.config.security.UserDetailsModel;
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
@@ -17,8 +20,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,10 +37,20 @@ public class TraineeController {
     private final TraineeService service;
 
     private final UserRepository userRepository;
+    private final PasswordEncryptionProvider passwordEncryptionProvider;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    public TraineeController(TraineeService service, UserRepository userRepository) {
+    public TraineeController(TraineeService service,
+                             UserRepository userRepository,
+                             PasswordEncryptionProvider passwordEncryptionProvider,
+                             JwtService jwtService,
+                             AuthenticationManager authenticationManager) {
         this.service = service;
         this.userRepository = userRepository;
+        this.passwordEncryptionProvider = passwordEncryptionProvider;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Operation(summary = "Create trainee")
@@ -44,9 +59,13 @@ public class TraineeController {
                     schema = @Schema(implementation = SignupResponse.class)) })
     @PostMapping("/trainee")
     public ResponseEntity<SignupResponse> createTrainee(@RequestBody CreateTraineeRequest body){
-        User user = new User(body.firstName, body.lastName, true, userRepository);
-        Trainee trainee = service.createTrainee(new Trainee(body.address,body.dateOfBirth,user));
-        SignupResponse response = new SignupResponse(trainee.getUser().getUsername(),trainee.getUser().getPassword());
+        User user = new User(body.firstName, body.lastName, true, userRepository,passwordEncryptionProvider);
+        Trainee trainee = service.createTrainee(new Trainee(body.address, body.dateOfBirth ,user));
+        String jwt = jwtService.generateToken(new HashMap<>(), new UserDetailsModel(trainee.getUser()));
+        SignupResponse response = new SignupResponse(
+                trainee.getUser().getUsername(),
+                trainee.getUser().getPassword(),
+                jwt);
         response.add(linkTo(methodOn(TraineeController.class).getTrainee(trainee.getUser().getUsername())).withSelfRel());
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);

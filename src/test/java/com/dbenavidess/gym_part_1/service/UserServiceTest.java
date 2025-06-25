@@ -2,6 +2,7 @@ package com.dbenavidess.gym_part_1.service;
 
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,17 +18,18 @@ public class UserServiceTest {
     @Autowired
     private UserRepository repository;
 
-
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
 
     @Test
     public void loginTest(){
         // Arrange
-        User user = new User("Daniel","Benavides",true, repository);
+        User user = new User("Daniel","Benavides",true, repository, passwordEncryptionProvider);
         User createdUser = repository.createUser(user);
 
         // Act & Assert
-        assertTrue(userService.login(createdUser.getUsername(),createdUser.getPassword()));
-        assertFalse(userService.login(createdUser.getUsername(),"wrong" + createdUser.getPassword()));
+        assertTrue(userService.loginMatch(createdUser.getUsername(),user.getPlainPassword()));
+        assertFalse(userService.loginMatch(createdUser.getUsername(),"wrong" + createdUser.getPassword()));
 
         repository.deleteUser(createdUser.getId());
 
@@ -36,7 +38,7 @@ public class UserServiceTest {
     @Test
     public void changeActiveStatusTest(){
         // Arrange
-        User user = new User("Daniel","Benavides",true, repository);
+        User user = new User("Daniel","Benavides",true, repository, passwordEncryptionProvider);
         User createdUser = repository.createUser(user);
 
         // Act
@@ -54,14 +56,14 @@ public class UserServiceTest {
     @Test
     public void changePasswordTest(){
         // Arrange
-        User user = new User("Daniel","Benavides",true, repository);
+        User user = new User("Daniel","Benavides",true, repository, passwordEncryptionProvider);
         User createdUser = repository.createUser(user);
 
         // Act
         userService.changePassword(createdUser.getUsername(), createdUser.getPassword(), "NewPassword");
         User foundUser = repository.searchUsername(user.getUsername());
         //Assert
-        assertEquals("NewPassword",foundUser.getPassword());
+        assertTrue(passwordEncryptionProvider.matches("NewPassword",foundUser.getPassword()));
 
         repository.deleteUser(createdUser.getId());
 

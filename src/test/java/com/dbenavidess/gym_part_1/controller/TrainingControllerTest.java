@@ -1,5 +1,8 @@
 package com.dbenavidess.gym_part_1.controller;
 
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
+import com.dbenavidess.gym_part_1.infrastructure.request.Login.LoginRequest;
+import com.dbenavidess.gym_part_1.infrastructure.response.LoginResponse;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.service.TrainerService;
 import com.dbenavidess.gym_part_1.service.TrainingService;
@@ -17,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,15 +56,43 @@ public class TrainingControllerTest {
     @Autowired
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
+
+    User user;
+    Trainer createdTrainer;
+    User user2;
+    Trainee createdTrainee;
+    String authHeader;
+
+    @BeforeEach
+    public void createUsersAndLogin() throws JsonProcessingException{
+        user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
+        createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("zumba"), user));
+        user2 = new User("Juan","Lopez",true, userRepository, passwordEncryptionProvider);
+        createdTrainee = traineeService.createTrainee(new Trainee("Juan's address", Date.valueOf("1990-08-10"), user2));
+
+        authHeader = login(
+                createdTrainer.getUser().getUsername(),
+                user.getPlainPassword());
+    }
+
+    private String login(String username, String password) throws JsonProcessingException {
+        LoginRequest request = new LoginRequest(
+                username,
+                password
+        );
+        RestAssured.baseURI = BASE_URI + "/login";
+        RequestSpecification httpRequest = RestAssured.given()
+                .header("Content-Type", "application/json")
+                .body(request);
+        LoginResponse response = mapper.readValue(httpRequest.post().asString(), LoginResponse.class);
+        return "Bearer " + response.jwtToken;
+    }
+
     @Test
     public void createTrainingTest() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
-        Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("zumba"), user));
-
-        User user2 = new User("Juan","Lopez",true, userRepository);
-        Trainee createdTrainee = traineeService.createTrainee(new Trainee("Juan's address", Date.valueOf("1990-08-10"), user2));
-
         CreateTrainingRequest request = new CreateTrainingRequest(
                 createdTrainer.getUser().getUsername(),
                 createdTrainee.getUser().getUsername(),
@@ -73,6 +105,7 @@ public class TrainingControllerTest {
         RestAssured.baseURI = BASE_URI + REQUEST_MAPPING_URI;
         RequestSpecification httpRequest = RestAssured.given()
                 .header("Content-Type", "application/json")
+                .header("Authorization",authHeader)
                 .body(request);
         //Act
         Response response = httpRequest.post();
@@ -84,10 +117,10 @@ public class TrainingControllerTest {
     @Test
     public void searchTrainings() throws JsonProcessingException {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer = trainerService.createTrainer(new Trainer(trainingTypeRepository.getByName("zumba"), user));
 
-        User user2 = new User("Juan","Lopez",true, userRepository);
+        User user2 = new User("Juan","Lopez",true, userRepository, passwordEncryptionProvider);
         Trainee createdTrainee = traineeService.createTrainee(new Trainee("Juan's address", Date.valueOf("1990-08-10"), user2));
 
         Training createdTraining = service.createTraining(
@@ -121,6 +154,7 @@ public class TrainingControllerTest {
 
         RequestSpecification httpRequest = RestAssured.given()
                 .header("Content-Type", "application/json")
+                .header("Authorization",authHeader)
                 .params(params);
         //Act
         System.out.println(httpRequest.get().asString());
@@ -129,10 +163,6 @@ public class TrainingControllerTest {
         //Assert
         assertEquals(2,response.size());
 
-
     }
-
-
-
 
 }

@@ -4,6 +4,7 @@ import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
+import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,14 +25,17 @@ public class TrainerServiceTest {
     @Autowired
     private TrainingTypeRepository trainingTypeRepository;
 
+    @Autowired
+    private PasswordEncryptionProvider passwordEncryptionProvider;
+
     @Test
     public void testCreateTrainerSuccess() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
-        User user2 = new User("Daniel","Benavides",true, userRepository);
+        User user2 = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer trainer2 = new Trainer(trainingTypeRepository.getByName("fitness"), user2);
         Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
 
@@ -59,7 +63,7 @@ public class TrainerServiceTest {
     @Test
     public void testUpdateTrainer() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer createdTrainer = trainerService.createTrainer(
                 new Trainer(trainingTypeRepository.getByName("resistance"), user)
         );
@@ -84,7 +88,7 @@ public class TrainerServiceTest {
     @Test
     public void testGetTrainer() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
@@ -114,11 +118,11 @@ public class TrainerServiceTest {
     @Test
     public void testGetAllTrainers() {
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
-        User user2 = new User("Juan","Lopez",true, userRepository);
+        User user2 = new User("Juan","Lopez",true, userRepository, passwordEncryptionProvider);
         Trainer trainer2 = new Trainer(trainingTypeRepository.getByName("zumba"), user2);
         Trainer createdTrainer2 = trainerService.createTrainer(trainer2);
 
@@ -139,7 +143,7 @@ public class TrainerServiceTest {
     public void testGetTrainerByUsername(){
 
         // Arrange
-        User user = new User("Daniel","Benavides",true, userRepository);
+        User user = new User("Daniel","Benavides",true, userRepository, passwordEncryptionProvider);
         Trainer trainer = new Trainer(trainingTypeRepository.getByName("zumba"), user);
         Trainer createdTrainer = trainerService.createTrainer(trainer);
 
