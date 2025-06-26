@@ -15,8 +15,11 @@ import java.util.UUID;
 @Repository
 public class TrainingTypeJpaRepository implements TrainingTypeRepository {
 
-    @Autowired
-    TrainingTypeEntityJpaRepository repository;
+    private final TrainingTypeEntityJpaRepository repository;
+
+    public TrainingTypeJpaRepository(TrainingTypeEntityJpaRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public TrainingType getById(UUID id) {

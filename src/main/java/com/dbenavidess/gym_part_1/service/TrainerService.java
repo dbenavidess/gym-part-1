@@ -15,8 +15,11 @@ import java.util.UUID;
 @Service
 public class TrainerService {
 
-    @Autowired
-    TrainerRepository repository;
+    private final TrainerRepository repository;
+
+    public TrainerService(TrainerRepository repository) {
+        this.repository = repository;
+    }
 
     public Trainer createTrainer(Trainer trainer){
 

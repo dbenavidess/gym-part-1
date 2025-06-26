@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 @RestController
 public class TrainingController {
 
-    TrainingService trainingService;
+    private final TrainingService trainingService;
 
     public TrainingController(TrainingService trainingService) {
         this.trainingService = trainingService;

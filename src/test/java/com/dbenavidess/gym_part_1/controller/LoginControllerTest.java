@@ -1,7 +1,7 @@
 package com.dbenavidess.gym_part_1.controller;
 
 import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
-import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.JwtRepository;
+import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.JwtRepository;
 import com.dbenavidess.gym_part_1.infrastructure.response.LoginResponse;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;

@@ -1,6 +1,6 @@
 package com.dbenavidess.gym_part_1.service;
 
-import com.dbenavidess.gym_part_1.config.security.JwtService;
+import com.dbenavidess.gym_part_1.config.security.service.JwtService;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;

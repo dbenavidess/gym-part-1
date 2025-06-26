@@ -1,4 +1,4 @@
-package com.dbenavidess.gym_part_1.infrastructure.repository.jpa;
+package com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories;
 
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.JwtEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

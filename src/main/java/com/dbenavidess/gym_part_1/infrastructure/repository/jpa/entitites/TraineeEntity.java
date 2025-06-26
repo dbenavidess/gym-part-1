@@ -20,7 +20,6 @@ import java.util.UUID;
 public class TraineeEntity {
 
     @Id
-//    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
     @OneToOne(orphanRemoval = true)

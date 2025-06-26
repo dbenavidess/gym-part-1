@@ -1,4 +1,4 @@
-package com.dbenavidess.gym_part_1.config.security;
+package com.dbenavidess.gym_part_1.config.security.userDetails;
 
 import com.dbenavidess.gym_part_1.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;

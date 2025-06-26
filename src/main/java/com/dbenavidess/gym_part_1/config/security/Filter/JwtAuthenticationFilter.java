@@ -1,7 +1,7 @@
 package com.dbenavidess.gym_part_1.config.security.Filter;
 
 
-import com.dbenavidess.gym_part_1.config.security.JwtService;
+import com.dbenavidess.gym_part_1.config.security.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

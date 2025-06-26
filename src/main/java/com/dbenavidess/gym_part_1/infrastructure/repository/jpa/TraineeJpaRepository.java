@@ -9,7 +9,6 @@ import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.Traine
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TraineeEntityJpaRepository;
 
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TrainerEntityJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +20,15 @@ import java.util.stream.Collectors;
 @Repository
 public class TraineeJpaRepository implements TraineeRepository {
 
-    @Autowired
-    TraineeEntityJpaRepository repository;
+    private final TraineeEntityJpaRepository repository;
+    private final TrainerEntityJpaRepository trainerEntityJpaRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    TrainerEntityJpaRepository trainerEntityJpaRepository;
-
-    @Autowired
-    UserRepository userRepository;
+    public TraineeJpaRepository(TraineeEntityJpaRepository repository, TrainerEntityJpaRepository trainerEntityJpaRepository, UserRepository userRepository) {
+        this.repository = repository;
+        this.trainerEntityJpaRepository = trainerEntityJpaRepository;
+        this.userRepository = userRepository;
+    }
 
     @Transactional()
     @Override

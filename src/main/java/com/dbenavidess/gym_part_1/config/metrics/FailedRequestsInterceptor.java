@@ -11,7 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Component
 public class FailedRequestsInterceptor implements HandlerInterceptor {
 
-    private Counter failedRequestsCounter;
+    private final Counter failedRequestsCounter;
 
     public FailedRequestsInterceptor(MeterRegistry meterRegistry) {
         failedRequestsCounter = Counter.builder( "failed.requests")

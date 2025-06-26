@@ -1,4 +1,4 @@
-package com.dbenavidess.gym_part_1.config.security;
+package com.dbenavidess.gym_part_1.config.security.userDetails;
 
 import com.dbenavidess.gym_part_1.domain.model.User;
 import org.springframework.security.core.GrantedAuthority;

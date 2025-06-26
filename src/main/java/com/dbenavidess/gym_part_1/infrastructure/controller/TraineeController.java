@@ -1,7 +1,7 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
-import com.dbenavidess.gym_part_1.config.security.JwtService;
-import com.dbenavidess.gym_part_1.config.security.UserDetailsModel;
+import com.dbenavidess.gym_part_1.config.security.service.JwtService;
+import com.dbenavidess.gym_part_1.config.security.userDetails.UserDetailsModel;
 import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
@@ -35,7 +35,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class TraineeController {
 
     private final TraineeService service;
-
     private final UserRepository userRepository;
     private final PasswordEncryptionProvider passwordEncryptionProvider;
     private final JwtService jwtService;

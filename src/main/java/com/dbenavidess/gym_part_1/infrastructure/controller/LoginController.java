@@ -1,7 +1,7 @@
 package com.dbenavidess.gym_part_1.infrastructure.controller;
 
-import com.dbenavidess.gym_part_1.config.security.BruteForceSecurityService;
-import com.dbenavidess.gym_part_1.config.security.JwtService;
+import com.dbenavidess.gym_part_1.config.security.service.BruteForceSecurityService;
+import com.dbenavidess.gym_part_1.config.security.service.JwtService;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.BruteForceSecurityEntity;
 import com.dbenavidess.gym_part_1.infrastructure.response.LoginResponse;

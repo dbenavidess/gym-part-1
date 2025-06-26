@@ -18,17 +18,19 @@ import java.util.UUID;
 @Service
 public class TrainingService {
 
-    @Autowired
-    TrainingRepository repository;
-    @Autowired
-    TrainingTypeRepository trainingTypeRepository;
+    private final TrainingRepository repository;
+    private final TrainingTypeRepository trainingTypeRepository;
+    private final TraineeService traineeService;
+    private final TrainerService trainerService;
 
-    @Autowired
-    TraineeService traineeService;
-    @Autowired
-    TrainerService trainerService;
+    public TrainingService(TrainingRepository repository, TrainingTypeRepository trainingTypeRepository, TraineeService traineeService, TrainerService trainerService) {
+        this.repository = repository;
+        this.trainingTypeRepository = trainingTypeRepository;
+        this.traineeService = traineeService;
+        this.trainerService = trainerService;
+    }
 
-    public Training createTraining(String name, Date date, Integer duration,String trainingTypeName, String trainerUsername, String traineeUsername){
+    public Training createTraining(String name, Date date, Integer duration, String trainingTypeName, String trainerUsername, String traineeUsername){
 
         Trainer trainer = trainerService.getTrainerByUsername(trainerUsername);
         Trainee trainee = traineeService.getTraineeByUsername(traineeUsername);

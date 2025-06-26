@@ -19,8 +19,11 @@ import java.util.UUID;
 @Repository
 public class TrainingJpaRepository implements TrainingRepository {
 
-    @Autowired
-    TrainingEntityJpaRepository repository;
+    private final TrainingEntityJpaRepository repository;
+
+    public TrainingJpaRepository(TrainingEntityJpaRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public Training createTraining(Training training) {

@@ -21,15 +21,15 @@ import java.util.UUID;
 @Repository
 public class TrainerJpaRepository implements TrainerRepository {
 
-    @Autowired
-    TrainerEntityJpaRepository repository;
+    private final TrainerEntityJpaRepository repository;
+    private final UserRepository userRepository;
+    private final TrainingTypeEntityJpaRepository trainingTypeRepository;
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    TrainingTypeEntityJpaRepository trainingTypeRepository;
-
+    public TrainerJpaRepository(TrainerEntityJpaRepository repository, UserRepository userRepository, TrainingTypeEntityJpaRepository trainingTypeRepository) {
+        this.repository = repository;
+        this.userRepository = userRepository;
+        this.trainingTypeRepository = trainingTypeRepository;
+    }
 
     @Transactional
     @Override

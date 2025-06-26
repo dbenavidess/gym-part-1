@@ -14,8 +14,12 @@ import java.util.UUID;
 
 @Service
 public class TraineeService {
-    @Autowired
-    TraineeRepository repository;
+
+    private final TraineeRepository repository;
+
+    public TraineeService(TraineeRepository repository) {
+        this.repository = repository;
+    }
 
     public Trainee createTrainee(Trainee trainee){
         Trainee res = repository.createTrainee(trainee);

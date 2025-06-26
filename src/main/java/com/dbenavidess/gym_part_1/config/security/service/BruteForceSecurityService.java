@@ -1,7 +1,7 @@
-package com.dbenavidess.gym_part_1.config.security;
+package com.dbenavidess.gym_part_1.config.security.service;
 
 import com.dbenavidess.gym_part_1.domain.model.User;
-import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.BruteForceSecurityRepository;
+import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.BruteForceSecurityRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.BruteForceSecurityEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.UserEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.UserEntityJpaRepository;

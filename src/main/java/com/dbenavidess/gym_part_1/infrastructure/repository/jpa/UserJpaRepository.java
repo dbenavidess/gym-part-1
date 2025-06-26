@@ -14,8 +14,11 @@ import java.util.UUID;
 @Repository
 public class UserJpaRepository implements UserRepository {
 
-    @Autowired
-    UserEntityJpaRepository repository;
+    private final UserEntityJpaRepository repository;
+
+    public UserJpaRepository(UserEntityJpaRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public User createUser(User user) {
