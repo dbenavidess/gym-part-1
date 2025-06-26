@@ -5,7 +5,6 @@ import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TrainingTypeEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TrainingTypeEntityJpaRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

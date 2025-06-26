@@ -6,9 +6,6 @@ import com.dbenavidess.gym_part_1.domain.model.Training;
 import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingRepository;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;

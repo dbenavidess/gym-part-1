@@ -4,7 +4,6 @@ import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.UserEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.UserEntityJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

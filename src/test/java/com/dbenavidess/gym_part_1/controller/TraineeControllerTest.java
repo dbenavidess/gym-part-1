@@ -54,13 +54,13 @@ public class TraineeControllerTest {
     @Autowired
     private PasswordEncryptionProvider passwordEncryptionProvider;
 
-    User user;
-    Trainee createdTrainee;
-    User user2;
-    Trainer createdTrainer;
-    User user3;
-    Trainer createdTrainer2;
-    String authHeader;
+    private User user;
+    private Trainee createdTrainee;
+    private User user2;
+    private Trainer createdTrainer;
+    private User user3;
+    private Trainer createdTrainer2;
+    private String authHeader;
 
 
     @BeforeEach

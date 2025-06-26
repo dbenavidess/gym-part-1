@@ -8,7 +8,6 @@ import com.dbenavidess.gym_part_1.domain.repository.TrainingRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TrainingEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TrainingEntityJpaRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.Specifications.TrainingSpecification;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;

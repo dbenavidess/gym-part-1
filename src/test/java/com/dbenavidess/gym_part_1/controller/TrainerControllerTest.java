@@ -47,9 +47,10 @@ public class TrainerControllerTest {
 
     @Autowired
     private PasswordEncryptionProvider passwordEncryptionProvider;
-    User user;
-    Trainer createdTrainer;
-    String authHeader;
+
+    private User user;
+    private Trainer createdTrainer;
+    private String authHeader;
 
     @BeforeEach
     public void createUsersAndLogin() throws JsonProcessingException {

@@ -59,11 +59,11 @@ public class TrainingControllerTest {
     @Autowired
     private PasswordEncryptionProvider passwordEncryptionProvider;
 
-    User user;
-    Trainer createdTrainer;
-    User user2;
-    Trainee createdTrainee;
-    String authHeader;
+    private User user;
+    private Trainer createdTrainer;
+    private User user2;
+    private Trainee createdTrainee;
+    private String authHeader;
 
     @BeforeEach
     public void createUsersAndLogin() throws JsonProcessingException{

@@ -40,9 +40,9 @@ public class TrainingTypeControllerTest {
     @Autowired
     private PasswordEncryptionProvider passwordEncryptionProvider;
 
-    User user;
-    Trainee createdTrainee;
-    String authHeader;
+    private User user;
+    private Trainee createdTrainee;
+    private String authHeader;
 
     @BeforeEach
     public void createUsersAndLogin() throws JsonProcessingException {
@@ -73,7 +73,7 @@ public class TrainingTypeControllerTest {
                 .header("Authorization", authHeader)
                 .header("Content-Type", "application/json");
         //Act
-        List<TrainingType> response = mapper.readValue(httpRequest.get().asString(), new TypeReference<List<TrainingType>>(){} );
+        List<TrainingType> response = mapper.readValue(httpRequest.get().asString(), new TypeReference<>(){} );
         //Assert
         assertEquals(5,response.size());
 

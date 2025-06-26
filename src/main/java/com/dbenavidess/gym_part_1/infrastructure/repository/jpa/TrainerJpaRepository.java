@@ -7,10 +7,7 @@ import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TraineeEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TrainerEntity;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.entitites.TrainingTypeEntity;
-import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TraineeEntityJpaRepository;
 import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TrainerEntityJpaRepository;
-import com.dbenavidess.gym_part_1.infrastructure.repository.jpa.jpaRepositories.TrainingTypeEntityJpaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +20,10 @@ public class TrainerJpaRepository implements TrainerRepository {
 
     private final TrainerEntityJpaRepository repository;
     private final UserRepository userRepository;
-    private final TrainingTypeEntityJpaRepository trainingTypeRepository;
 
-    public TrainerJpaRepository(TrainerEntityJpaRepository repository, UserRepository userRepository, TrainingTypeEntityJpaRepository trainingTypeRepository) {
+    public TrainerJpaRepository(TrainerEntityJpaRepository repository, UserRepository userRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
-        this.trainingTypeRepository = trainingTypeRepository;
     }
 
     @Transactional

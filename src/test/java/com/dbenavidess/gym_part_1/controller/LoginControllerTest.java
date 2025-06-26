@@ -49,9 +49,9 @@ public class LoginControllerTest {
     @Autowired
     private JwtRepository jwtRepository;
 
-    User user;
-    Trainee createdTrainee;
-    String authHeader;
+    private User user;
+    private Trainee createdTrainee;
+    private String authHeader;
 
     @BeforeEach
     public void createUsersAndLogin() throws JsonProcessingException {

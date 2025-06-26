@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.Date;
+import java.util.NoSuchElementException;
 
 @Tag(name = "Login", description = "User operations")
 @RestController
@@ -96,10 +97,10 @@ public class LoginController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @ExceptionHandler(NoSuchElementException.class)
-//    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e){
-//        return ResponseEntity
-//                .status(HttpStatus.NOT_FOUND)
-//                .body(e.getMessage());
-//    }
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e){
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(e.getMessage());
+    }
 }
