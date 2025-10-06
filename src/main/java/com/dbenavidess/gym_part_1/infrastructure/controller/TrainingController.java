@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @RestController
 public class TrainingController {
@@ -64,6 +65,14 @@ public class TrainingController {
 
         List<Training> trainings = trainingService.searchTrainings(trainerUsername, from, to, traineeUsername,trainingTypeName);
         return ResponseEntity.ok(TrainingDetailsResponse.ofTrainingList(trainings));
+    }
+
+    @Operation(summary = "Delete training")
+    @ApiResponse(responseCode = "200", description = "Delete training")
+    @DeleteMapping("/training/{id}")
+    public ResponseEntity<Void> deleteTraining(@PathVariable UUID id) {
+        trainingService.deleteTraining(id);
+        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

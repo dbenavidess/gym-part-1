@@ -5,7 +5,7 @@ jwt:
   expiration: 86400000
 
 application:
-  name: "gym-part-1"
+  name: "main-service"
   storagePath: "./storage.txt"
 
 spring:
@@ -26,6 +26,23 @@ management:
     export:
       prometheus:
         enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      workloadService:
+        slidingWindowSize: 5               # number of calls to measure
+        failureRateThreshold: 50           # % of failures before opening breaker
+        waitDurationInOpenState: 10s       # how long to wait before half-open
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
 
 logging:
   pattern:
