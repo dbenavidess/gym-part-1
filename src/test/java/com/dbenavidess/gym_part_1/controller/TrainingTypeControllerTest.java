@@ -5,7 +5,7 @@ import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.model.User;
 import com.dbenavidess.gym_part_1.domain.repository.UserRepository;
 import com.dbenavidess.gym_part_1.domain.util.PasswordEncryptionProvider;
-import com.dbenavidess.gym_part_1.infrastructure.request.Login.LoginRequest;
+import com.dbenavidess.gym_part_1.infrastructure.request.login.LoginRequest;
 import com.dbenavidess.gym_part_1.infrastructure.response.LoginResponse;
 import com.dbenavidess.gym_part_1.service.TraineeService;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -16,7 +16,10 @@ public class WorkloadMessagePublisher {
     }
 
     public void sendWorkloadEvent(WorkloadRequest request) {
-        jmsTemplate.convertAndSend(WORKLOAD_QUEUE, request);
+        jmsTemplate.convertAndSend(WORKLOAD_QUEUE, request, message -> {
+            message.setStringProperty("_type", "WorkloadRequest");
+            return message;
+        });
         System.out.println("Sent JMS workload event for trainer: " + request.getTrainerUsername());
     }
 }

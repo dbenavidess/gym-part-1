@@ -1,4 +1,4 @@
-package com.dbenavidess.gym_part_1.infrastructure.request.Trainee;
+package com.dbenavidess.gym_part_1.infrastructure.request.trainee;
 
 import jakarta.validation.constraints.NotNull;
 

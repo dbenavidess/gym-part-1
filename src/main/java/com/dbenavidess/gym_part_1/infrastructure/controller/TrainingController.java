@@ -2,7 +2,7 @@ package com.dbenavidess.gym_part_1.infrastructure.controller;
 
 import com.dbenavidess.gym_part_1.service.TrainingService;
 import com.dbenavidess.gym_part_1.domain.model.Training;
-import com.dbenavidess.gym_part_1.infrastructure.request.Training.CreateTrainingRequest;
+import com.dbenavidess.gym_part_1.infrastructure.request.training.CreateTrainingRequest;
 import com.dbenavidess.gym_part_1.infrastructure.response.TrainingDetailsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

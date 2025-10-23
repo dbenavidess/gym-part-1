@@ -3,15 +3,15 @@ package com.dbenavidess.gym_part_1.infrastructure.request.workload;
 import java.time.LocalDate;
 
 public class WorkloadRequest {
+
     private String trainerUsername;
     private String trainerFirstName;
     private String trainerLastName;
     private boolean isActive;
     private LocalDate trainingDate;
     private int trainingDuration;
-    private String actionType; // "ADD" or "DELETE"
+    private String actionType;
 
-    // Getters / setters / constructors
 
     public String getTrainerUsername() {
         return trainerUsername;

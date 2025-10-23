@@ -1,4 +1,4 @@
-package com.dbenavidess.gym_part_1.infrastructure.request.Trainer;
+package com.dbenavidess.gym_part_1.infrastructure.request.trainer;
 
 import jakarta.validation.constraints.NotNull;
 

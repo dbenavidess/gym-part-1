@@ -38,11 +38,12 @@ public class WebSecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/trainee").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/trainer").permitAll()
+                        .requestMatchers( "/trainee").permitAll()
+                        .requestMatchers( "/trainer").permitAll()
+                        .requestMatchers( "/training").permitAll()
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider())//smelly
+                .authenticationProvider(authenticationProvider())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(AbstractHttpConfigurer::disable)
