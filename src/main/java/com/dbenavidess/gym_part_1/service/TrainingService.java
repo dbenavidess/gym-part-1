@@ -1,7 +1,5 @@
 package com.dbenavidess.gym_part_1.service;
 
-import com.dbenavidess.gym_part_1.config.security.service.JwtService;
-import com.dbenavidess.gym_part_1.config.security.userDetails.UserDetailsModel;
 import com.dbenavidess.gym_part_1.domain.model.Trainee;
 import com.dbenavidess.gym_part_1.domain.model.Trainer;
 import com.dbenavidess.gym_part_1.domain.model.Training;
@@ -9,15 +7,10 @@ import com.dbenavidess.gym_part_1.domain.model.TrainingType;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingRepository;
 import com.dbenavidess.gym_part_1.domain.repository.TrainingTypeRepository;
 import com.dbenavidess.gym_part_1.infrastructure.request.workload.WorkloadRequest;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import com.dbenavidess.gym_part_1.messaging.WorkloadMessagePublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,19 +21,16 @@ public class TrainingService {
     private final TrainingTypeRepository trainingTypeRepository;
     private final TraineeService traineeService;
     private final TrainerService trainerService;
-    private final RestTemplate restTemplate;
 
-//    private final String workloadServiceUrl = "http://localhost:8082/workload";
-    private final String workloadServiceUrl = "http://TRAINER-WORKLOAD-SERVICE/workload";
-    private final JwtService jwtService;
+    private final WorkloadMessagePublisher publisher;
 
-    public TrainingService(TrainingRepository repository, TrainingTypeRepository trainingTypeRepository, TraineeService traineeService, TrainerService trainerService, RestTemplate restTemplate, JwtService jwtService) {
+
+    public TrainingService(TrainingRepository repository, TrainingTypeRepository trainingTypeRepository, TraineeService traineeService, TrainerService trainerService, WorkloadMessagePublisher publisher) {
         this.repository = repository;
         this.trainingTypeRepository = trainingTypeRepository;
         this.traineeService = traineeService;
         this.trainerService = trainerService;
-        this.restTemplate = restTemplate;
-        this.jwtService = jwtService;
+        this.publisher = publisher;
     }
 
     public Training createTraining(String name, Date date, Integer duration, String trainingTypeName, String trainerUsername, String traineeUsername){
@@ -57,9 +47,8 @@ public class TrainingService {
         // Prepare WorkloadRequest
         WorkloadRequest request = buildWorkloadRequest(training,"ADD");
 
-        // Send to secondary service
-        String jwt = jwtService.generateToken(new HashMap<>(),new UserDetailsModel(training.getTrainer().getUser()));
-        sendWorkloadUpdate(request,jwt);
+        // Send to secondary service through
+        sendWorkloadUpdate(request);
 
         return training;
     }
@@ -72,8 +61,7 @@ public class TrainingService {
         WorkloadRequest request = buildWorkloadRequest(training,"DELETE");
 
         // Send to secondary service
-        String jwt = jwtService.generateToken(new HashMap<>(),new UserDetailsModel(training.getTrainer().getUser()));
-        sendWorkloadUpdate(request,jwt);
+        sendWorkloadUpdate(request);
         repository.deleteTraining(id);
     }
 
@@ -99,15 +87,8 @@ public class TrainingService {
         return repository.searchTrainings(from,to,trainer,trainee,type);
     }
 
-    @CircuitBreaker(name = "workloadService", fallbackMethod = "handleWorkloadServiceFailure")
-    public void sendWorkloadUpdate(WorkloadRequest request, String jwt) {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(jwt); // use same user or a service account
-
-        HttpEntity<WorkloadRequest> entity = new HttpEntity<>(request, headers);
-        restTemplate.postForObject(workloadServiceUrl, entity, Void.class);
+    public void sendWorkloadUpdate(WorkloadRequest request) {
+        publisher.sendWorkloadEvent(request);
     }
 
     private WorkloadRequest buildWorkloadRequest(Training training, String actionType) {

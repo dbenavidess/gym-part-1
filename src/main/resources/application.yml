@@ -15,6 +15,14 @@ spring:
   profiles:
     active: dev
 
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+    in-memory: false   # false = use external broker
+    jms:
+      pub-sub-domain: false  # false = Point-to-Point (queue), true = Topic
+
 management:
   endpoint:
     health:
@@ -27,22 +35,6 @@ management:
       prometheus:
         enabled: true
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    register-with-eureka: true
-    fetch-registry: true
-
-resilience4j:
-  circuitbreaker:
-    instances:
-      workloadService:
-        slidingWindowSize: 5               # number of calls to measure
-        failureRateThreshold: 50           # % of failures before opening breaker
-        waitDurationInOpenState: 10s       # how long to wait before half-open
-        permittedNumberOfCallsInHalfOpenState: 2
-        automaticTransitionFromOpenToHalfOpenEnabled: true
 
 logging:
   pattern:
