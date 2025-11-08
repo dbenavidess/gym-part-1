@@ -48,7 +48,7 @@ public class LoginController {
         if (bruteForceSecurity == null)
             bruteForceSecurity = bruteForceSecurityService.createBruteForceSecurity(loginRequest.username);
 
-        if(bruteForceSecurity.getUnlockDate() != null && bruteForceSecurity.getUnlockDate().before(new Date())){
+        if(bruteForceSecurity.getUnlockDate() != null && bruteForceSecurity.getUnlockDate().after(new Date())){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         try{

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -40,7 +41,7 @@ public class TrainingController {
                 body.trainingTypeName,
                 body.trainerUsername,
                 body.traineeUsername);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(res,HttpStatus.OK);
     }
     @Operation(summary = "Get trainer")
     @ApiResponse(responseCode = "200", description = "Get trainer by username",
@@ -53,17 +54,27 @@ public class TrainingController {
             @Parameter(description = "Training type name")
             @RequestParam(required = false) String trainingTypeName,
             @Parameter(description = "Start date")
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @Parameter(description = "End date")
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date to,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
             @Parameter(description = "Trainee's username")
             @RequestParam(required = false) String traineeUsername) {
 
-        if((traineeUsername == null || traineeUsername.isEmpty()) && (trainerUsername ==null || trainerUsername.isEmpty())){
+        trainerUsername = (trainerUsername != null && !trainerUsername.isBlank())
+                ? trainerUsername : null;
+        traineeUsername = (traineeUsername != null && !traineeUsername.isBlank())
+                ? traineeUsername : null;
+        trainingTypeName = (trainingTypeName != null && !trainingTypeName.isBlank())
+                ? trainingTypeName : null;
+
+        if (trainerUsername == null && traineeUsername == null) {
             throw new IllegalArgumentException("Invalid Trainer/Trainee");
         }
 
-        List<Training> trainings = trainingService.searchTrainings(trainerUsername, from, to, traineeUsername,trainingTypeName);
+        Date fromDate = (from != null) ? Date.valueOf(from) : null;
+        Date toDate   = (to != null)   ? Date.valueOf(to)   : null;
+
+        List<Training> trainings = trainingService.searchTrainings(trainerUsername, fromDate, toDate, traineeUsername,trainingTypeName);
         return ResponseEntity.ok(TrainingDetailsResponse.ofTrainingList(trainings));
     }
 
