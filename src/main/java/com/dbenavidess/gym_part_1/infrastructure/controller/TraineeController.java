@@ -63,7 +63,7 @@ public class TraineeController {
         String jwt = jwtService.generateToken(new HashMap<>(), new UserDetailsModel(trainee.getUser()));
         SignupResponse response = new SignupResponse(
                 trainee.getUser().getUsername(),
-                trainee.getUser().getPassword(),
+                user.getPlainPassword(),
                 jwt);
         response.add(linkTo(methodOn(TraineeController.class).getTrainee(trainee.getUser().getUsername())).withSelfRel());
 

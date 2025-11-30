@@ -25,6 +25,7 @@ public class User {
     @Getter
     private String password;
     @Getter
+    @JsonIgnore
     private String plainPassword;
 
     private boolean isActive;

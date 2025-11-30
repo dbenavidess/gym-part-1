@@ -32,15 +32,18 @@ public class TrainingController {
     @Operation(summary = "Create training")
     @ApiResponse(responseCode = "200", description = "Create training")
     @PostMapping("/training")
-    public ResponseEntity<Training> createTraining(@RequestBody CreateTrainingRequest body){
+    public ResponseEntity<TrainingDetailsResponse> createTraining(@RequestBody CreateTrainingRequest body){
 
-        Training res = trainingService.createTraining(
+        Training training = trainingService.createTraining(
                 body.name,
                 body.date,
                 body.duration,
                 body.trainingTypeName,
                 body.trainerUsername,
                 body.traineeUsername);
+
+        TrainingDetailsResponse res = new TrainingDetailsResponse(training);
+
         return new ResponseEntity<>(res,HttpStatus.OK);
     }
     @Operation(summary = "Get trainer")

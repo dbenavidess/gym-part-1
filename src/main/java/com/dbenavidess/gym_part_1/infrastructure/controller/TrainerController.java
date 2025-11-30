@@ -60,7 +60,7 @@ public class TrainerController {
         Trainer trainer = service.createTrainer(new Trainer(type,user));
         String jwt = jwtService.generateToken(new HashMap<>(),new UserDetailsModel(trainer.getUser()));
 
-        return new ResponseEntity<>(new SignupResponse(trainer.getUser().getUsername(),trainer.getUser().getPassword(),jwt), HttpStatus.CREATED);
+        return new ResponseEntity<>(new SignupResponse(trainer.getUser().getUsername(),user.getPlainPassword(),jwt), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Update trainer")
