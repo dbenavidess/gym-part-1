@@ -35,7 +35,6 @@ management:
       prometheus:
         enabled: true
 
-
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - [%6.32X{transactionId}] %msg%n"
